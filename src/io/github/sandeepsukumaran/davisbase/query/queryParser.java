@@ -16,6 +16,8 @@
  */
 package io.github.sandeepsukumaran.davisbase.query;
 
+import io.github.sandeepsukumaran.davisbase.main.DavisBase;
+import io.github.sandeepsukumaran.davisbase.exception.NoDatabaseSelectedException;
 /**
  *
  * @author Sandeep
@@ -24,8 +26,9 @@ public class queryParser {
     /**
      * Parse the received user input and perform operations.
      * @param inputCommand String input by user from STDIN.
+     * @throws io.github.sandeepsukumaran.davisbase.exception.NoDatabaseSelectedException
      */
-    public static void parseInputCommand(String inputCommand){
+    public static void parseInputCommand(String inputCommand) throws NoDatabaseSelectedException{
         switch(inputCommand){
             case EXIT_COMMAND:
                 io.github.sandeepsukumaran.davisbase.main.DavisBase.exitFlag = true;
@@ -33,9 +36,28 @@ public class queryParser {
             case HELP_COMMAND:
                 displayHelpText();
                 return;
+            case SHOW_TABLES_COMMAND:
+                showTables();
+                return;
+            case SHOW_DATABASES_COMMAND:
+                showDatabases();
+                return;
         }
     }
     
+    private static void showDatabases(){
+        return;
+    }
+    
+    /**
+     * List the tables in the active database.
+     * @throws NoDatabaseSelectedException 
+     */
+    private static void showTables() throws NoDatabaseSelectedException{
+        if (DavisBase.activeDatabase == null)
+            throw new NoDatabaseSelectedException();
+        return;
+    }
     private static void displayHelpText(){
         System.out.println("\n\nFor developer information visit:\n\thttps://sandeepsukumaran.github.io/DavisBase\n\n");
         System.out.println("List of all supported commands:\nNote that all text commands must be first on line and end with \';\'");
@@ -65,4 +87,6 @@ public class queryParser {
     //Keywords list
     static final String EXIT_COMMAND = "exit";
     static final String HELP_COMMAND = "help";
+    static final String SHOW_TABLES_COMMAND = "show tables";
+    static final String SHOW_DATABASES_COMMAND = "show databases";
 }

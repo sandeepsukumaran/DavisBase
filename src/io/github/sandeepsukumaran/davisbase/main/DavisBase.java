@@ -8,12 +8,21 @@ package io.github.sandeepsukumaran.davisbase.main;
 import java.util.Scanner;
 
 import io.github.sandeepsukumaran.davisbase.query.queryParser;
+import io.github.sandeepsukumaran.davisbase.exception.NoDatabaseSelectedException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 /**
  *
  * @author Sandeep
  */
 public class DavisBase {
 
+    /**
+     * Display the welcome message.
+     */
     private static void displaySplash(){
         System.out.println("Welcome to DavisBase. Commands end with ;");
         System.out.println("Server version: "+VERSIONSTRING+"\n");
@@ -22,11 +31,47 @@ public class DavisBase {
     }
     
     /**
+     * Look for and set-up required file system at each program startup. 
+     * @return -1 if file structure is not properly set up.
+     */
+    private static int setupFS(){
+        String workingDirectory = System.getProperty("user.dir");
+        Path dataFolderPath = Paths.get(workingDirectory+FileSystems.getDefault().getSeparator()+"data");
+        if (Files.exists(dataFolderPath)){
+            if(!Files.isReadable(dataFolderPath)){
+                System.out.println("User does not have permission to read files in this location.");
+                return -1;
+            }else if(!Files.isWritable(dataFolderPath)){
+                System.out.println("WARNING: User does not have write permission in this location. Read only mode.");
+                return 0;
+            }
+        }else if(!Files.isWritable(Paths.get(workingDirectory))){
+            System.out.println("ERROR : Unable to setup file structures. Terminating...");
+            return -1;
+        }else{
+            //File structure doesn't exist but can be created.
+            try{
+                Files.createDirectories(Paths.get(dataFolderPath.toString()+FileSystems.getDefault().getSeparator()+"catalog"));
+                Files.createFile(Paths.get(dataFolderPath.toString()+FileSystems.getDefault().getSeparator()+"catalog"+FileSystems.getDefault().getSeparator()+"davisbase_tables.tbl"));
+                Files.createFile(Paths.get(dataFolderPath.toString()+FileSystems.getDefault().getSeparator()+"catalog"+FileSystems.getDefault().getSeparator()+"davisbase_columns.tbl"));
+                Files.createDirectory(Paths.get(dataFolderPath.toString()+FileSystems.getDefault().getSeparator()+"user_data"));
+            }catch(IOException e){
+                System.out.println("ERROR : Unable to setup file structures. Terminating...");
+                return -1;
+            }
+        }
+        return 0;
+    }
+    
+    /**
      * @param args the command line arguments (ignored)
      */
     public static void main(String[] args) {
         //display startup splash screen
         displaySplash();
+        if (setupFS() == -1){
+            return;
+        }else;
         
         String inputString;
         
@@ -36,7 +81,11 @@ public class DavisBase {
             //Read and sanitize user input
             inputString = inputStream.next().replace("\n", "").replace("\r", "").trim().toLowerCase();
             //Parse input and perform operations
-            queryParser.parseInputCommand(inputString);
+            try{
+                queryParser.parseInputCommand(inputString);
+            }catch(NoDatabaseSelectedException e){
+                System.out.println("\nERROR 1046 : No database selected.");
+            }
         }
         
         System.out.println("\nBye\n\n");
@@ -45,6 +94,7 @@ public class DavisBase {
     //Variable declarations
     /**< Set to true to indicate program must terminate.*/public static boolean exitFlag = false;
     /**< Variable attached to STDIN to read user inputs, delimited by ;*/static Scanner inputStream = new Scanner(System.in).useDelimiter(";");
+    /**< Name of currently selected database.*/public static String activeDatabase = "";//null - use this if implementing databases feature
     
     /**< Variable holding the text string displayed as prompt. Terminated with >.*/static String promptText = "davisql>";
     /**< String describing version number.*/static final String VERSIONSTRING = "0.1.0";
