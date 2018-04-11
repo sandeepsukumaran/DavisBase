@@ -21,6 +21,7 @@ import io.github.sandeepsukumaran.davisbase.exception.InvalidQuerySyntaxExceptio
 import io.github.sandeepsukumaran.davisbase.exception.NoSuchColumnException;
 import io.github.sandeepsukumaran.davisbase.exception.NoSuchTableException;
 import io.github.sandeepsukumaran.davisbase.main.DavisBase;
+import io.github.sandeepsukumaran.davisbase.result.ResultSet;
 import io.github.sandeepsukumaran.davisbase.tree.ReadRows;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -98,7 +99,7 @@ public class selectQueryHandler {
     
     private void selectQueryExecute() throws NoSuchTableException, NoSuchColumnException{
         ArrayList<String> tableNames = DavisBase.getTableNames();
-        String tableName = selectAllMatcher.group("tablename");
+        String tableName = selectMatcher.group("tablename");
         if (!tableNames.contains(tableName))
             throw new NoSuchTableException(tableName);
         else;
@@ -107,12 +108,15 @@ public class selectQueryHandler {
         
         if (!tablecols.containsAll(selectcols)){
             //not all requested columns are in the table
-        }
+            selectcols.removeAll(tablecols);
+            throw new NoSuchColumnException(selectcols.get(0),tableName);
+        }else;
         
-        String whereclause = selectAllMatcher.group("whereclause");
+        String whereclause = selectMatcher.group("whereclause");
         if (whereclause==null){
-            //select all rows all columns
-            Display.displayResults(tablecols,ReadRows.readRows(tableName));
+            //select all rows
+            ResultSet rs = ReadRows.readRows(tableName);
+            Display.displayResults(tablecols,rs.projectColumns(selectcols,tablecols));
         }else{
             //where condition exists
             whereclause = whereclause.substring(5).trim();
@@ -122,20 +126,25 @@ public class selectQueryHandler {
                 String colName;
                 if ((whereclause.charAt(pos-1)!='>') && (whereclause.charAt(pos-1)!='<')){
                     colName = whereclause.substring(0,pos).trim();
-                    Display.displayResults(tablecols,ReadRows.readRows(tableName,colName,"="));
+                    ResultSet rs = ReadRows.readRows(tableName,colName,"=");
+                    Display.displayResults(tablecols,rs.projectColumns(selectcols,tablecols));
                 }else{
                     colName = whereclause.substring(0,pos-1).trim(); //pos is location of =
-                    Display.displayResults(tablecols,ReadRows.readRows(tableName,colName,whereclause.substring(pos-1,pos+1)));
+                    ResultSet rs = ReadRows.readRows(tableName,colName,whereclause.substring(pos-1,pos+1));
+                    Display.displayResults(tablecols,rs.projectColumns(selectcols,tablecols));
                 }
             }else if(whereclause.contains("<>")){
                 String colName = whereclause.substring(0,whereclause.indexOf("<>")).trim();
-                Display.displayResults(tablecols,ReadRows.readRows(tableName,colName,"<>"));
+                ResultSet rs = ReadRows.readRows(tableName,colName,"<>");
+                Display.displayResults(tablecols,rs.projectColumns(selectcols,tablecols));
             }else if(whereclause.contains("is null")){
                 String colName = whereclause.substring(0,whereclause.indexOf("is null")).trim();
-                Display.displayResults(tablecols,ReadRows.readRows(tableName,colName,true));
+                ResultSet rs = ReadRows.readRows(tableName,colName,true);
+                Display.displayResults(tablecols,rs.projectColumns(selectcols,tablecols));
             }else{
                 String colName = whereclause.substring(0,whereclause.indexOf("is not null")).trim();
-                Display.displayResults(tablecols,ReadRows.readRows(tableName,colName,false));
+                ResultSet rs = ReadRows.readRows(tableName,colName,false);
+                Display.displayResults(tablecols,rs.projectColumns(selectcols,tablecols));
             }
         }
     }

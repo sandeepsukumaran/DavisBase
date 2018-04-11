@@ -16,6 +16,8 @@
  */
 package io.github.sandeepsukumaran.davisbase.result;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author Sandeep
@@ -24,4 +26,39 @@ public class ResultSet {
     public ResultSet(){
         
     }
+    
+    public ArrayList<ResultSetRow> getData(){return data;}
+    
+    public void deleteColumns(ArrayList<Integer> indices){
+        data.forEach((rsr) -> {
+            rsr.deleteColumns(indices);
+        });
+    }
+    
+    public ResultSet projectColumns(ArrayList<String>selectcols, ArrayList<String>tablecols){
+        ArrayList<Integer> indices = new ArrayList<>();
+        selectcols.forEach((selectcol) -> {
+            indices.add(tablecols.indexOf(selectcol));
+        });
+        return this.projectColumns(indices);
+    }
+    
+    public ResultSet projectColumns(ArrayList<Integer> indices){
+        int numRows = data.size();
+        for(int i=0;i<numRows;++i){
+            ResultSetRow rsr = data.get(i);
+            data.set(i,rsr.projectColumns(indices));
+        }
+        return this;
+    }
+    
+    public void deleteColumns(ArrayList<String>selectcols, ArrayList<String>tablecols){
+        ArrayList<Integer> indices = new ArrayList<>();
+        selectcols.forEach((selectcol) -> {
+            indices.add(tablecols.indexOf(selectcol));
+        });
+        this.deleteColumns(indices);
+    }
+    
+    public ArrayList<ResultSetRow> data;
 }
