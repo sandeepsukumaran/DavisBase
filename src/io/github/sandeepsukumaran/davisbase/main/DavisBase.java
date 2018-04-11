@@ -5,15 +5,19 @@
  */
 package io.github.sandeepsukumaran.davisbase.main;
 
+import io.github.sandeepsukumaran.davisbase.exception.InvalidQuerySyntaxException;
 import java.util.Scanner;
 
 import io.github.sandeepsukumaran.davisbase.query.queryParser;
 import io.github.sandeepsukumaran.davisbase.exception.NoDatabaseSelectedException;
+import io.github.sandeepsukumaran.davisbase.exception.NoSuchColumnException;
+import io.github.sandeepsukumaran.davisbase.exception.NoSuchTableException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.util.ArrayList;
 /**
  *
  * @author Sandeep
@@ -85,19 +89,48 @@ public class DavisBase {
                 queryParser.parseInputCommand(inputString);
             }catch(NoDatabaseSelectedException e){
                 System.out.println("\nERROR 1046 : No database selected.");
+            }catch(InvalidQuerySyntaxException|NoSuchTableException|NoSuchColumnException e){
+                System.out.println(e);
             }
         }
         
         System.out.println("\nBye\n\n");
     }
     
+    /**
+     * Read table names from davisbase_tables.tbl file and populate list of table names.
+     */
+    public static void populateTableNames(){
+        //read from davisbase_tables.tbl and get the list of table names
+        tableNames = new ArrayList<>();
+    }
+    
+    /**
+     * Get the names of tables in current database.
+     * @return names of tables as ArrayList of String.
+     */
+    public static ArrayList<String> getTableNames(){
+        return tableNames;
+    }
+    
+    /**
+     * Returns names of columns in given table by reading davisbase_columns.tbl file
+     * @param tableName Name of table
+     * @return ArrayList of String containing names of columns in table in ordinal order.
+     */
+    public static ArrayList<String> getTableColumns(String tableName){
+        ArrayList<String> colNames = null;
+        return colNames;
+    }
+
     //Variable declarations
     /**< Set to true to indicate program must terminate.*/public static boolean exitFlag = false;
     /**< Variable attached to STDIN to read user inputs, delimited by ;*/static Scanner inputStream = new Scanner(System.in).useDelimiter(";");
     /**< Name of currently selected database.*/public static String activeDatabase = "";//null - use this if implementing databases feature
+    public static ArrayList<String> tableNames;
     
     /**< Variable holding the text string displayed as prompt. Terminated with >.*/static String promptText = "davisql>";
-    /**< String describing version number.*/static final String VERSIONSTRING = "0.1.0";
+    /**< String describing version number.*/public static final String VERSIONSTRING = "0.1.0";
     /**< Copyright message.*/static final String COPYRIGHTSTRING = "Copyright (c) 2018, Sandeep Sukumaran. All rights reserved.";
     /**< Page size used by database application.*/ static final long PAGESIZE = 512;
 }
