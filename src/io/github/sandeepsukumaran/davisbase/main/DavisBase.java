@@ -12,6 +12,7 @@ import io.github.sandeepsukumaran.davisbase.query.queryParser;
 import io.github.sandeepsukumaran.davisbase.exception.NoDatabaseSelectedException;
 import io.github.sandeepsukumaran.davisbase.exception.NoSuchColumnException;
 import io.github.sandeepsukumaran.davisbase.exception.NoSuchTableException;
+import io.github.sandeepsukumaran.davisbase.tableinformation.TableColumnInfo;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -119,10 +120,14 @@ public class DavisBase {
      * @return ArrayList of String containing names of columns in table in ordinal order.
      */
     public static ArrayList<String> getTableColumns(String tableName){
-        ArrayList<String> colNames = null;
-        return colNames;
+        return getTableInfo(tableName).colNames;
     }
 
+    public static TableColumnInfo getTableInfo(String tableName){
+        TableColumnInfo tci = null;
+        return tci;
+    }
+    
     //Variable declarations
     /**< Set to true to indicate program must terminate.*/public static boolean exitFlag = false;
     /**< Variable attached to STDIN to read user inputs, delimited by ;*/static Scanner inputStream = new Scanner(System.in).useDelimiter(";");

@@ -18,6 +18,7 @@ package io.github.sandeepsukumaran.davisbase.tree;
 
 import io.github.sandeepsukumaran.davisbase.exception.NoSuchColumnException;
 import io.github.sandeepsukumaran.davisbase.result.ResultSet;
+import io.github.sandeepsukumaran.davisbase.tableinformation.TableInfo;
 
 /**
  *
@@ -57,5 +58,15 @@ public class ReadRows {
      */
     public static ResultSet readRows(String tableName, String colName, Boolean isnull) throws NoSuchColumnException{
         ResultSet rs = null;return rs;
+    }
+    
+    public static TableInfo getTableInfoFromMetadata(String tableName){
+        TableInfo ti=null;
+        /*
+        Read all rows from davisbase_tables.tbl. If the first page is leaf, great. Else go to first leaf
+        and read all rows sequentially. Each record starts with a header where the first field is the size
+        of the header in int.
+        */
+        return ti;
     }
 }
