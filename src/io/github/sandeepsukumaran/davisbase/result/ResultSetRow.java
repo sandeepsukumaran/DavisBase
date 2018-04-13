@@ -26,7 +26,7 @@ public class ResultSetRow {
     public ResultSetRow(){
         contents = new ArrayList<>();
     }
-    public ArrayList<Object> getRowContents(){
+    public ArrayList<String> getRowContents(){
         return contents;
     }
     
@@ -41,5 +41,5 @@ public class ResultSetRow {
         return res;
     }
     
-    public ArrayList<Object> contents;
+    public ArrayList<String> contents;
 }

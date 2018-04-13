@@ -122,7 +122,7 @@ public class selectQueryHandler {
         if (whereclause==null){
             //select all rows
             ResultSet rs = ReadRows.readRows(tableName);
-            Display.displayResults(tablecols,rs.projectColumns(selectcols,tablecols));
+            Display.displayResults(selectcols,rs.projectColumns(selectcols,tablecols));
         }else{
             //where condition exists
             whereclause = whereclause.substring(5).trim();
@@ -133,24 +133,24 @@ public class selectQueryHandler {
                 if ((whereclause.charAt(pos-1)!='>') && (whereclause.charAt(pos-1)!='<')){
                     colName = whereclause.substring(0,pos).trim();
                     ResultSet rs = ReadRows.readRows(tableName,colName,"=",whereclause.substring(pos+1,whereclause.length()-1));
-                    Display.displayResults(tablecols,rs.projectColumns(selectcols,tablecols));
+                    Display.displayResults(selectcols,rs.projectColumns(selectcols,tablecols));
                 }else{
                     colName = whereclause.substring(0,pos-1).trim(); //pos is location of =
                     ResultSet rs = ReadRows.readRows(tableName,colName,whereclause.substring(pos-1,pos+1),whereclause.substring(pos+1,whereclause.length()-1));
-                    Display.displayResults(tablecols,rs.projectColumns(selectcols,tablecols));
+                    Display.displayResults(selectcols,rs.projectColumns(selectcols,tablecols));
                 }
             }else if(whereclause.contains("<>")){
                 String colName = whereclause.substring(0,whereclause.indexOf("<>")).trim();
                 ResultSet rs = ReadRows.readRows(tableName,colName,"<>",whereclause.substring(whereclause.indexOf("<>")+2,whereclause.length()-1));
-                Display.displayResults(tablecols,rs.projectColumns(selectcols,tablecols));
+                Display.displayResults(selectcols,rs.projectColumns(selectcols,tablecols));
             }else if(whereclause.contains("is null")){
                 String colName = whereclause.substring(0,whereclause.indexOf("is null")).trim();
                 ResultSet rs = ReadRows.readRows(tableName,colName,true);
-                Display.displayResults(tablecols,rs.projectColumns(selectcols,tablecols));
+                Display.displayResults(selectcols,rs.projectColumns(selectcols,tablecols));
             }else{
                 String colName = whereclause.substring(0,whereclause.indexOf("is not null")).trim();
                 ResultSet rs = ReadRows.readRows(tableName,colName,false);
-                Display.displayResults(tablecols,rs.projectColumns(selectcols,tablecols));
+                Display.displayResults(selectcols,rs.projectColumns(selectcols,tablecols));
             }
         }
     }

@@ -17,7 +17,9 @@
 package io.github.sandeepsukumaran.davisbase.display;
 
 import io.github.sandeepsukumaran.davisbase.result.ResultSet;
+import io.github.sandeepsukumaran.davisbase.result.ResultSetRow;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  *
@@ -28,6 +30,74 @@ public class Display {
         
     }
     public static void displayResults(ArrayList<String> columns, ResultSet rs){
+        if(rs==null || rs.data==null){
+            System.out.println("Empty set.");
+            return;
+        }else;
         
+        int numCols = columns.size();
+        ArrayList<Integer> colwidths = new ArrayList<>();
+        //Initialise width to fit column names
+        columns.forEach((column) -> {
+            colwidths.add(column.length());
+        });
+        
+        //Find maximum length for data in each column
+        rs.data.forEach((rsr) -> {
+            for(int i=0;i<numCols;++i){
+                int len = rsr.contents.get(i).length(); 
+                if(len > colwidths.get(i))
+                    colwidths.set(i, len);
+            }
+        });
+        
+        int totW=0;
+        for(int i=0;i<numCols;++i){
+            int newW = colwidths.get(i)+2;
+            colwidths.set(i, newW);
+            totW += newW;
+        }
+        
+        //print separator line of +,- 's
+        for(int i=0;i<numCols;++i){
+            System.out.print("+");
+            for(int j=0;j<colwidths.get(j);++j)
+                System.out.print("-");
+        }
+        System.out.println("+");
+        
+        //print column names
+        for(int i=0;i<numCols;++i){
+            System.out.print("|");
+            System.out.print(StringCenter.center(columns.get(i),colwidths.get(i)));
+        }
+        System.out.println("|");
+        
+        //print separator line of +,- 's
+        for(int i=0;i<numCols;++i){
+            System.out.print("+");
+            for(int j=0;j<colwidths.get(j);++j)
+                System.out.print("-");
+        }
+        System.out.println("+");
+        
+        //print data
+        for(ResultSetRow rsr:rs.data){
+            for(int i=0;i<numCols;++i){
+                System.out.print("|");
+                System.out.print(StringCenter.center(rsr.contents.get(i),colwidths.get(i)));
+            }
+            System.out.println("|");
+        }
+        
+        //print separator line of +,- 's
+        for(int i=0;i<numCols;++i){
+            System.out.print("+");
+            for(int j=0;j<colwidths.get(j);++j)
+                System.out.print("-");
+        }
+        System.out.println("+");
+        
+        System.out.println(Integer.toString(rs.data.size())+" rows in set.");
     }
 }
