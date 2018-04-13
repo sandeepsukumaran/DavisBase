@@ -19,6 +19,7 @@ package io.github.sandeepsukumaran.davisbase.query;
 import io.github.sandeepsukumaran.davisbase.display.Display;
 import io.github.sandeepsukumaran.davisbase.exception.FileAccessException;
 import io.github.sandeepsukumaran.davisbase.exception.InvalidQuerySyntaxException;
+import io.github.sandeepsukumaran.davisbase.exception.MissingTableFileException;
 import io.github.sandeepsukumaran.davisbase.exception.NoSuchColumnException;
 import io.github.sandeepsukumaran.davisbase.exception.NoSuchTableException;
 import io.github.sandeepsukumaran.davisbase.main.DavisBase;
@@ -48,8 +49,9 @@ public class selectQueryHandler {
      * @throws NoSuchColumnException
      * @throws InvalidQuerySyntaxException
      * @throws io.github.sandeepsukumaran.davisbase.exception.FileAccessException
+     * @throws io.github.sandeepsukumaran.davisbase.exception.MissingTableFileException
      */
-    public void execute() throws NoSuchTableException,NoSuchColumnException,InvalidQuerySyntaxException, FileAccessException{
+    public void execute() throws NoSuchTableException,NoSuchColumnException,InvalidQuerySyntaxException, FileAccessException, MissingTableFileException{
         if (selectAllMatcher.matches()){
             //select all query
             selectAllQueryExecute();
@@ -61,7 +63,7 @@ public class selectQueryHandler {
             throw new InvalidQuerySyntaxException();
     }
     
-    private void selectAllQueryExecute() throws NoSuchTableException, NoSuchColumnException, FileAccessException{
+    private void selectAllQueryExecute() throws NoSuchTableException, NoSuchColumnException, FileAccessException, MissingTableFileException{
         ArrayList<String> tableNames = DavisBase.getTableNames();
         String tableName = selectAllMatcher.group("tablename");
         if (!tableNames.contains(tableName))
@@ -99,7 +101,7 @@ public class selectQueryHandler {
         }
     }
     
-    private void selectQueryExecute() throws NoSuchTableException, NoSuchColumnException, FileAccessException{
+    private void selectQueryExecute() throws NoSuchTableException, NoSuchColumnException, FileAccessException, MissingTableFileException{
         ArrayList<String> tableNames = DavisBase.getTableNames();
         String tableName = selectMatcher.group("tablename");
         if (!tableNames.contains(tableName))

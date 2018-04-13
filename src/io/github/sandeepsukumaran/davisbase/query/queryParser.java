@@ -18,6 +18,7 @@ package io.github.sandeepsukumaran.davisbase.query;
 
 import io.github.sandeepsukumaran.davisbase.exception.FileAccessException;
 import io.github.sandeepsukumaran.davisbase.exception.InvalidQuerySyntaxException;
+import io.github.sandeepsukumaran.davisbase.exception.MissingTableFileException;
 import io.github.sandeepsukumaran.davisbase.main.DavisBase;
 import io.github.sandeepsukumaran.davisbase.exception.NoDatabaseSelectedException;
 import io.github.sandeepsukumaran.davisbase.exception.NoSuchColumnException;
@@ -35,8 +36,9 @@ public class queryParser {
      * @throws io.github.sandeepsukumaran.davisbase.exception.NoSuchTableException
      * @throws io.github.sandeepsukumaran.davisbase.exception.NoSuchColumnException
      * @throws io.github.sandeepsukumaran.davisbase.exception.FileAccessException
+     * @throws io.github.sandeepsukumaran.davisbase.exception.MissingTableFileException
      */
-    public static void parseInputCommand(String inputCommand) throws NoDatabaseSelectedException,InvalidQuerySyntaxException,NoSuchTableException,NoSuchColumnException, FileAccessException{
+    public static void parseInputCommand(String inputCommand) throws NoDatabaseSelectedException,InvalidQuerySyntaxException,NoSuchTableException,NoSuchColumnException, FileAccessException, MissingTableFileException{
         switch(inputCommand){
             case EXIT_COMMAND:
                 io.github.sandeepsukumaran.davisbase.main.DavisBase.exitFlag = true;
