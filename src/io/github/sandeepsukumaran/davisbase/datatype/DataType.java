@@ -16,6 +16,8 @@
  */
 package io.github.sandeepsukumaran.davisbase.datatype;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -30,6 +32,36 @@ public class DataType {
     public DataType(String dataType){
         type = DATATYPEINDEX.get(dataType);
         size = DATATYPESIZE.get(type);
+    }
+    public int getDataTypeAsInt(){
+        return type;
+    }
+    public int getDataTypeSize(){
+        return size;
+    }
+    
+    public static String dataAsString(int type, int val){
+        switch(type){
+            case 1:
+            case 2:
+            case 3: return Integer.toString(val);
+        }
+        return "";
+    }
+    public static String dataAsString(int type, long val){
+        switch(type){
+            case 4: return Long.toString(val);
+            case 7: return (new SimpleDateFormat("YYYY-MM-DD_hh:mm:ss").format(new Date(val)));
+            case 8: return (new SimpleDateFormat("YYYY-MM-DD").format(new Date(val)));
+        }
+        return "";
+    }
+    public static String dataAsString(int type, double val){
+        switch(type){
+            case 5: return Float.toString((float)val);
+            case 6: return Double.toString(val);
+        }
+        return "";
     }
     int type;
     int size;

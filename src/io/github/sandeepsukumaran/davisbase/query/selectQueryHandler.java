@@ -17,6 +17,7 @@
 package io.github.sandeepsukumaran.davisbase.query;
 
 import io.github.sandeepsukumaran.davisbase.display.Display;
+import io.github.sandeepsukumaran.davisbase.exception.FileAccessException;
 import io.github.sandeepsukumaran.davisbase.exception.InvalidQuerySyntaxException;
 import io.github.sandeepsukumaran.davisbase.exception.NoSuchColumnException;
 import io.github.sandeepsukumaran.davisbase.exception.NoSuchTableException;
@@ -46,8 +47,9 @@ public class selectQueryHandler {
      * @throws NoSuchTableException
      * @throws NoSuchColumnException
      * @throws InvalidQuerySyntaxException
+     * @throws io.github.sandeepsukumaran.davisbase.exception.FileAccessException
      */
-    public void execute() throws NoSuchTableException,NoSuchColumnException,InvalidQuerySyntaxException{
+    public void execute() throws NoSuchTableException,NoSuchColumnException,InvalidQuerySyntaxException, FileAccessException{
         if (selectAllMatcher.matches()){
             //select all query
             selectAllQueryExecute();
@@ -59,7 +61,7 @@ public class selectQueryHandler {
             throw new InvalidQuerySyntaxException();
     }
     
-    private void selectAllQueryExecute() throws NoSuchTableException, NoSuchColumnException{
+    private void selectAllQueryExecute() throws NoSuchTableException, NoSuchColumnException, FileAccessException{
         ArrayList<String> tableNames = DavisBase.getTableNames();
         String tableName = selectAllMatcher.group("tablename");
         if (!tableNames.contains(tableName))
@@ -97,7 +99,7 @@ public class selectQueryHandler {
         }
     }
     
-    private void selectQueryExecute() throws NoSuchTableException, NoSuchColumnException{
+    private void selectQueryExecute() throws NoSuchTableException, NoSuchColumnException, FileAccessException{
         ArrayList<String> tableNames = DavisBase.getTableNames();
         String tableName = selectMatcher.group("tablename");
         if (!tableNames.contains(tableName))
