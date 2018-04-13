@@ -65,7 +65,7 @@ public class DataType {
     }
     int type;
     int size;
-
+    
     /**< Sizes of various data types in bytes.*/public static final HashMap<Integer,Integer> DATATYPESIZE;
     /**< Internal index of data type.*/public static final HashMap<String,Integer> DATATYPEINDEX;
     static{

@@ -367,4 +367,107 @@ public class ReadRows {
         tci.numCols = tci.colNames.size();
         return tci;
     }
+
+    private boolean Evaluate(DataType dtype, Object curVal,Object tarVal,String op){
+        switch(dtype.getDataTypeAsInt()){
+            case 1://tinyint
+            case 2://smallint
+                short scurval = (Short)curVal;
+                short starval = (Short)tarVal;
+                switch(op){
+                    case "<": return scurval<starval;
+                    case "<=": return scurval<=starval;
+                    case ">": return scurval>starval;
+                    case ">=": return scurval>=starval;
+                    case "=": return scurval==starval;
+                    case "<>": return scurval!=starval;
+                }
+                break;
+            case 3://int
+                int icurval = (Integer)curVal;
+                int itarval = (Integer)tarVal;
+                switch(op){
+                    case "<": return icurval<itarval;
+                    case "<=": return icurval<=itarval;
+                    case ">": return icurval>itarval;
+                    case ">=": return icurval>=itarval;
+                    case "=": return icurval==itarval;
+                    case "<>": return icurval!=itarval;
+                }
+                break;
+            case 4://bigint
+                long lcurval = (Long)curVal;
+                long ltarval = (Long)tarVal;
+                switch(op){
+                    case "<": return lcurval<ltarval;
+                    case "<=": return lcurval<=ltarval;
+                    case ">": return lcurval>ltarval;
+                    case ">=": return lcurval>=ltarval;
+                    case "=": return lcurval==ltarval;
+                    case "<>": return lcurval!=ltarval;
+                }
+                break;
+            case 5://real
+                float fcurval = (Float)curVal;
+                float ftarval = (Float)tarVal;
+                switch(op){
+                    case "<": return fcurval<ftarval;
+                    case "<=": return fcurval<=ftarval;
+                    case ">": return fcurval>ftarval;
+                    case ">=": return fcurval>=ftarval;
+                    case "=": return fcurval==ftarval;
+                    case "<>": return fcurval!=ftarval;
+                }
+                break;
+            case 6://double
+                double dcurval = (Double)curVal;
+                double dtarval = (Double)tarVal;
+                switch(op){
+                    case "<": return dcurval<dtarval;
+                    case "<=": return dcurval<=dtarval;
+                    case ">": return dcurval>dtarval;
+                    case ">=": return dcurval>=dtarval;
+                    case "=": return dcurval==dtarval;
+                    case "<>": return dcurval!=dtarval;
+                }
+                break;
+            case 7://datetime
+                long dttcurval = (Long)curVal;
+                long dtttarval = (Long)tarVal;
+                switch(op){
+                    case "<": return dttcurval<dtttarval;
+                    case "<=": return dttcurval<=dtttarval;
+                    case ">": return dttcurval>dtttarval;
+                    case ">=": return dttcurval>=dtttarval;
+                    case "=": return dttcurval==dtttarval;
+                    case "<>": return dttcurval!=dtttarval;
+                }
+                break;
+            case 8://date
+                long dtcurval = (Long)curVal;
+                long dttarval = (Long)tarVal;
+                switch(op){
+                    case "<": return dtcurval<dttarval;
+                    case "<=": return dtcurval<=dttarval;
+                    case ">": return dtcurval>dttarval;
+                    case ">=": return dtcurval>=dttarval;
+                    case "=": return dtcurval==dttarval;
+                    case "<>": return dtcurval!=dttarval;
+                }
+                break;
+            case 9://text
+                String stcurval = (String)curVal;
+                String sttarval = (String)tarVal;
+                switch(op){
+                    case "<": return stcurval.compareTo(sttarval)<0;
+                    case "<=": return stcurval.compareTo(sttarval)<=0;
+                    case ">": return stcurval.compareTo(sttarval)>0;
+                    case ">=": return stcurval.compareTo(sttarval)>=0;
+                    case "=": return stcurval.equals(sttarval);
+                    case "<>": return !stcurval.equals(sttarval);
+                }
+                break;
+        }
+        return false;
+    }
 }
