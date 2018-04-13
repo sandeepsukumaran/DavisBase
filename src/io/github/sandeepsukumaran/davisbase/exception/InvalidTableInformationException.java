@@ -14,26 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package io.github.sandeepsukumaran.davisbase.tableinformation;
+package io.github.sandeepsukumaran.davisbase.exception;
 
 /**
  *
  * @author Sandeep
  */
-public class TableInfo {
-    public TableInfo(){
-        
+public class InvalidTableInformationException extends Exception{
+    public InvalidTableInformationException(String tableName){
+        super("Table information for "+tableName+" does not match design specifications. Suspected file corruption.");
     }
-    public TableInfo(int rowid, String tabName, int record_count, int root_page){
-        tableName = tabName;
-        recordCount = record_count;
-        row_id = rowid;
-        rootPage = root_page;
-    }
-
-    /**< Name of table.*/public String tableName;
-    /**< Number of records in table.*/public int recordCount;
-    /**< Page number of root page. Will be 1 or 3.*/public int rootPage;
-    ///**< Length of a record>*/public int avgLength;
-    /**< row_id of table entry in meta-data table.*/public int row_id;
 }

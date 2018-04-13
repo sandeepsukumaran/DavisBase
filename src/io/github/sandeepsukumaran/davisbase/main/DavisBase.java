@@ -137,5 +137,5 @@ public class DavisBase {
     /**< Variable holding the text string displayed as prompt. Terminated with >.*/static String promptText = "davisql>";
     /**< String describing version number.*/public static final String VERSIONSTRING = "0.1.0";
     /**< Copyright message.*/static final String COPYRIGHTSTRING = "Copyright (c) 2018, Sandeep Sukumaran. All rights reserved.";
-    /**< Page size used by database application.*/ static final long PAGESIZE = 512;
+    /**< Page size used by database application.*/ public static final long PAGESIZE = 512;
 }
