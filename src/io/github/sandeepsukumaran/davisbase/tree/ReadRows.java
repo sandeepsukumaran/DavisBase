@@ -18,6 +18,7 @@ package io.github.sandeepsukumaran.davisbase.tree;
 
 import io.github.sandeepsukumaran.davisbase.datatype.DataType;
 import io.github.sandeepsukumaran.davisbase.exception.FileAccessException;
+import io.github.sandeepsukumaran.davisbase.exception.InvalidDataType;
 import io.github.sandeepsukumaran.davisbase.exception.InvalidTableInformationException;
 import io.github.sandeepsukumaran.davisbase.exception.MissingTableFileException;
 import io.github.sandeepsukumaran.davisbase.exception.NoSuchColumnException;
@@ -192,11 +193,215 @@ public class ReadRows {
      * @param tableName Name of table to be read from. Guaranteed to exist.
      * @param colName Name of column to be used for WHERE clause.
      * @param operator Comparison operator <,=,<=,>,>=,<>
+     * @param tarValue Value to be compared against.
      * @return ResultSet of data read
      * @throws NoSuchColumnException
+     * @throws io.github.sandeepsukumaran.davisbase.exception.FileAccessException
+     * @throws io.github.sandeepsukumaran.davisbase.exception.MissingTableFileException
+     * @throws io.github.sandeepsukumaran.davisbase.exception.InvalidDataType
      */
-    public static ResultSet readRows(String tableName, String colName, String operator) throws NoSuchColumnException{
-        ResultSet rs = null;return rs;
+    public static ResultSet readRows(String tableName, String colName, String operator, String tarValue) throws NoSuchColumnException, FileAccessException, MissingTableFileException, InvalidDataType{
+        ResultSet rs = new ResultSet();
+        try{
+            TableColumnInfo schema = getTableColumnInfoFromMetadata(tableName);
+        
+            int colNum = schema.colNames.indexOf(colName);
+            if(colNum==-1)
+                throw new NoSuchColumnException(colName, tableName);
+            else;
+        
+            String workingDirectory = System.getProperty("user.dir"); // gets current working directory
+            String absoluteFilePath = workingDirectory + File.separator + "data" + File.separator + "user_data" + File.separator + tableName+".tbl";
+            File file = new File(absoluteFilePath);
+            if (!(file.exists() && !file.isDirectory())){
+                throw new MissingTableFileException(tableName);
+            }else;
+        
+            RandomAccessFile tableFile = new RandomAccessFile(absoluteFilePath, "rw");
+            if(tableFile.length() < DavisBase.PAGESIZE) //no meta data information found
+                throw new InvalidTableInformationException(tableName);
+            else;
+            
+            Object targetValue=null;
+            switch(schema.colDataTypes.get(colNum).getDataTypeAsInt()){
+                case 1://tinyint
+                case 2://smallint
+                    targetValue = Short.parseShort(tarValue);
+                    break;
+                case 3://int
+                    targetValue = Integer.parseInt(tarValue);
+                    break;
+                case 4://bigint
+                case 7://datetime
+                case 8://date
+                    targetValue = Long.parseLong(tarValue);
+                    break;
+                case 5://real
+                    targetValue = Float.parseFloat(tarValue);
+                    break;
+                case 6://double
+                    targetValue = Double.parseDouble(tarValue);
+                    break;
+                case 9:
+                    targetValue = tarValue;       
+            }
+            
+            int curPage = 1;
+            while (curPage != -1){
+                long pageStart = curPage*DavisBase.PAGESIZE;
+                tableFile.seek(pageStart);
+                tableFile.skipBytes(1); //unused- will be page type
+                int numRecordsInPage = tableFile.readByte();
+                tableFile.skipBytes(2);//unused will be start of cell area
+                int nextPage = tableFile.readInt();
+                ArrayList<Short> cellLocations = new ArrayList<>();
+                for(int i=0;i<numRecordsInPage;++i)
+                    cellLocations.add(tableFile.readShort());
+                
+                for(Short cellLocation:cellLocations){
+                    boolean useThisRecord = true;
+                    tableFile.seek(pageStart+cellLocation);
+                    
+                    tableFile.skipBytes(2);//skip over payload size
+                    int row_id = tableFile.readInt();
+                    tableFile.skipBytes(1);//skip over number of columns
+                    ArrayList<Boolean> isnull = new ArrayList<>();
+                    HashMap<Integer,Integer> textFieldLength = new HashMap<>();
+                    for(int col=0;col<schema.numCols;++col){
+                        int serialTypeCode = tableFile.readByte();
+                        if (serialTypeCode<4)
+                            isnull.add(true);
+                        else if (serialTypeCode==12)
+                            isnull.add(true);
+                        else
+                            isnull.add(false);
+                        if (serialTypeCode>12)
+                            textFieldLength.put(col, serialTypeCode - 12);
+                    }
+                    
+                    if(isnull.get(colNum)) //current record holds a null value for required column
+                        continue;
+                    else;
+                    
+                    //read record data
+                    ResultSetRow rsr = new ResultSetRow();
+                    for(int col=0;useThisRecord && col<schema.numCols;++col){
+                        switch(schema.colDataTypes.get(col).getDataTypeAsInt()){
+                            case 1://TINYINT
+                                if(isnull.get(col)){
+                                    rsr.contents.add("NULL");
+                                    tableFile.skipBytes(1);
+                                }else{
+                                    int val = tableFile.readByte();
+                                    rsr.contents.add(DataType.dataAsString(1,val));
+                                    if((col==colNum)&&(!evaluate("tinyint",val,targetValue,operator)))
+                                        useThisRecord = false;
+                                    else;
+                                }
+                                break;
+                            case 2://SMALLINT
+                                if(isnull.get(col)){
+                                    rsr.contents.add("NULL");
+                                    tableFile.skipBytes(2);
+                                }else{
+                                    int val = tableFile.readShort();
+                                    rsr.contents.add(DataType.dataAsString(2,val));
+                                    if((col==colNum)&&(!evaluate("smallint",val,targetValue,operator)))
+                                        useThisRecord = false;
+                                    else;
+                                }
+                            case 3://INT
+                                if(isnull.get(col)){
+                                    rsr.contents.add("NULL");
+                                    tableFile.skipBytes(4);
+                                }else{
+                                    int val = tableFile.readInt();
+                                    rsr.contents.add(DataType.dataAsString(3,val));
+                                    if((col==colNum)&&(!evaluate("int",val,targetValue,operator)))
+                                        useThisRecord = false;
+                                    else;
+                                }
+                            case 4://BIGINT
+                                if(isnull.get(col)){
+                                    rsr.contents.add("NULL");
+                                    tableFile.skipBytes(8);
+                                }else{
+                                    long val = tableFile.readLong();
+                                    rsr.contents.add(DataType.dataAsString(4,val));
+                                    if((col==colNum)&&(!evaluate("bigint",val,targetValue,operator)))
+                                        useThisRecord = false;
+                                    else;
+                                }
+                            case 5://REAL
+                                if(isnull.get(col)){
+                                    rsr.contents.add("NULL");
+                                    tableFile.skipBytes(4);
+                                }else{
+                                    float val = tableFile.readFloat();
+                                    rsr.contents.add(DataType.dataAsString(5,val));
+                                    if((col==colNum)&&(!evaluate("real",val,targetValue,operator)))
+                                        useThisRecord = false;
+                                    else;
+                                }
+                            case 6://DOUBLE
+                                if(isnull.get(col)){
+                                    rsr.contents.add("NULL");
+                                    tableFile.skipBytes(8);
+                                }else{
+                                    double val = tableFile.readDouble();
+                                    rsr.contents.add(DataType.dataAsString(6,val));
+                                    if((col==colNum)&&(!evaluate("double",val,targetValue,operator)))
+                                        useThisRecord = false;
+                                    else;
+                                }
+                            case 7://DATETIME
+                                if(isnull.get(col)){
+                                    rsr.contents.add("NULL");
+                                    tableFile.skipBytes(8);
+                                }else{
+                                    long val = tableFile.readLong();
+                                    rsr.contents.add(DataType.dataAsString(7,val));
+                                    if((col==colNum)&&(!evaluate("datetime",val,targetValue,operator)))
+                                        useThisRecord = false;
+                                    else;
+                                }
+                            case 8://DATE
+                                if(isnull.get(col)){
+                                    rsr.contents.add("NULL");
+                                    tableFile.skipBytes(8);
+                                }else{
+                                    long val = tableFile.readLong();
+                                    rsr.contents.add(DataType.dataAsString(8,val));
+                                    if((col==colNum)&&(!evaluate("date",val,targetValue,operator)))
+                                        useThisRecord = false;
+                                    else;
+                                }
+                            case 9://TEXT
+                                if(isnull.get(col)){
+                                    rsr.contents.add("NULL");
+                                    tableFile.skipBytes(1);
+                                }else{
+                                    byte[] textBuffer = new byte[textFieldLength.get(col)];
+                                    tableFile.read(textBuffer);
+                                    String val = new String(textBuffer);
+                                    rsr.contents.add(val);
+                                    if((col==colNum)&&(!evaluate("text",val,targetValue,operator)))
+                                        useThisRecord = false;
+                                    else;
+                                }
+                        }
+                    }
+                    
+                    //all data in a single record read
+                    if(useThisRecord)
+                        rs.data.add(rsr);
+                    else;
+                }
+            }
+        }catch(InvalidTableInformationException | IOException e){throw new FileAccessException();
+        }catch(MissingTableFileException e){throw e;
+        }catch(NumberFormatException e){throw new InvalidDataType(tarValue);}
+        return rs;
     }
     
     /**
@@ -368,8 +573,8 @@ public class ReadRows {
         return tci;
     }
 
-    private boolean Evaluate(DataType dtype, Object curVal,Object tarVal,String op){
-        switch(dtype.getDataTypeAsInt()){
+    private static boolean evaluate(String dtype, Object curVal,Object tarVal,String op){
+        switch(DataType.getDataTypeAsInt(dtype)){
             case 1://tinyint
             case 2://smallint
                 short scurval = (Short)curVal;

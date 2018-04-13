@@ -18,6 +18,7 @@ package io.github.sandeepsukumaran.davisbase.query;
 
 import io.github.sandeepsukumaran.davisbase.display.Display;
 import io.github.sandeepsukumaran.davisbase.exception.FileAccessException;
+import io.github.sandeepsukumaran.davisbase.exception.InvalidDataType;
 import io.github.sandeepsukumaran.davisbase.exception.InvalidQuerySyntaxException;
 import io.github.sandeepsukumaran.davisbase.exception.MissingTableFileException;
 import io.github.sandeepsukumaran.davisbase.exception.NoSuchColumnException;
@@ -50,8 +51,9 @@ public class selectQueryHandler {
      * @throws InvalidQuerySyntaxException
      * @throws io.github.sandeepsukumaran.davisbase.exception.FileAccessException
      * @throws io.github.sandeepsukumaran.davisbase.exception.MissingTableFileException
+     * @throws io.github.sandeepsukumaran.davisbase.exception.InvalidDataType
      */
-    public void execute() throws NoSuchTableException,NoSuchColumnException,InvalidQuerySyntaxException, FileAccessException, MissingTableFileException{
+    public void execute() throws NoSuchTableException,NoSuchColumnException,InvalidQuerySyntaxException, FileAccessException, MissingTableFileException, InvalidDataType{
         if (selectAllMatcher.matches()){
             //select all query
             selectAllQueryExecute();
@@ -63,7 +65,7 @@ public class selectQueryHandler {
             throw new InvalidQuerySyntaxException();
     }
     
-    private void selectAllQueryExecute() throws NoSuchTableException, NoSuchColumnException, FileAccessException, MissingTableFileException{
+    private void selectAllQueryExecute() throws NoSuchTableException, NoSuchColumnException, FileAccessException, MissingTableFileException, InvalidDataType{
         ArrayList<String> tableNames = DavisBase.getTableNames();
         String tableName = selectAllMatcher.group("tablename");
         if (!tableNames.contains(tableName))
@@ -83,14 +85,14 @@ public class selectQueryHandler {
                 String colName;
                 if ((whereclause.charAt(pos-1)!='>') && (whereclause.charAt(pos-1)!='<')){
                     colName = whereclause.substring(0,pos).trim();
-                    Display.displayResults(tablecols,ReadRows.readRows(tableName,colName,"="));
+                    Display.displayResults(tablecols,ReadRows.readRows(tableName,colName,"=",whereclause.substring(pos+1,whereclause.length()-1)));
                 }else{
                     colName = whereclause.substring(0,pos-1).trim(); //pos is location of =
-                    Display.displayResults(tablecols,ReadRows.readRows(tableName,colName,whereclause.substring(pos-1,pos+1)));
+                    Display.displayResults(tablecols,ReadRows.readRows(tableName,colName,whereclause.substring(pos-1,pos+1),whereclause.substring(pos+1,whereclause.length()-1)));
                 }
             }else if(whereclause.contains("<>")){
                 String colName = whereclause.substring(0,whereclause.indexOf("<>")).trim();
-                Display.displayResults(tablecols,ReadRows.readRows(tableName,colName,"<>"));
+                Display.displayResults(tablecols,ReadRows.readRows(tableName,colName,"<>",whereclause.substring(whereclause.indexOf("<>")+2,whereclause.length()-1)));
             }else if(whereclause.contains("is null")){
                 String colName = whereclause.substring(0,whereclause.indexOf("is null")).trim();
                 Display.displayResults(tablecols,ReadRows.readRows(tableName,colName,true));
@@ -101,7 +103,7 @@ public class selectQueryHandler {
         }
     }
     
-    private void selectQueryExecute() throws NoSuchTableException, NoSuchColumnException, FileAccessException, MissingTableFileException{
+    private void selectQueryExecute() throws NoSuchTableException, NoSuchColumnException, FileAccessException, MissingTableFileException, InvalidDataType{
         ArrayList<String> tableNames = DavisBase.getTableNames();
         String tableName = selectMatcher.group("tablename");
         if (!tableNames.contains(tableName))
@@ -130,16 +132,16 @@ public class selectQueryHandler {
                 String colName;
                 if ((whereclause.charAt(pos-1)!='>') && (whereclause.charAt(pos-1)!='<')){
                     colName = whereclause.substring(0,pos).trim();
-                    ResultSet rs = ReadRows.readRows(tableName,colName,"=");
+                    ResultSet rs = ReadRows.readRows(tableName,colName,"=",whereclause.substring(pos+1,whereclause.length()-1));
                     Display.displayResults(tablecols,rs.projectColumns(selectcols,tablecols));
                 }else{
                     colName = whereclause.substring(0,pos-1).trim(); //pos is location of =
-                    ResultSet rs = ReadRows.readRows(tableName,colName,whereclause.substring(pos-1,pos+1));
+                    ResultSet rs = ReadRows.readRows(tableName,colName,whereclause.substring(pos-1,pos+1),whereclause.substring(pos+1,whereclause.length()-1));
                     Display.displayResults(tablecols,rs.projectColumns(selectcols,tablecols));
                 }
             }else if(whereclause.contains("<>")){
                 String colName = whereclause.substring(0,whereclause.indexOf("<>")).trim();
-                ResultSet rs = ReadRows.readRows(tableName,colName,"<>");
+                ResultSet rs = ReadRows.readRows(tableName,colName,"<>",whereclause.substring(whereclause.indexOf("<>")+2,whereclause.length()-1));
                 Display.displayResults(tablecols,rs.projectColumns(selectcols,tablecols));
             }else if(whereclause.contains("is null")){
                 String colName = whereclause.substring(0,whereclause.indexOf("is null")).trim();

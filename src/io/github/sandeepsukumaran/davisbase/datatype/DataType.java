@@ -36,8 +36,14 @@ public class DataType {
     public int getDataTypeAsInt(){
         return type;
     }
+    public static int getDataTypeAsInt(String dType){
+        return DATATYPEINDEX.get(dType);
+    }
     public int getDataTypeSize(){
         return size;
+    }
+    public static int getDataTypeSize(String dType){
+        return DATATYPESIZE.get(DATATYPEINDEX.get(dType));
     }
     
     public static String dataAsString(int type, int val){
