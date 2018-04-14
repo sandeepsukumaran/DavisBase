@@ -22,6 +22,7 @@ import io.github.sandeepsukumaran.davisbase.exception.InvalidQuerySyntaxExceptio
 import io.github.sandeepsukumaran.davisbase.exception.NoSuchTableException;
 import io.github.sandeepsukumaran.davisbase.main.DavisBase;
 import io.github.sandeepsukumaran.davisbase.tableinformation.TableColumnInfo;
+import java.nio.ByteBuffer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -72,7 +73,13 @@ public class insertQueryHandler {
         ArrayList<Object> colData = parseValues(tabcolinfo,values);
         
         //only TEXT fields maybe null indicated by ""
-        byte[] record = buildRecord(colData,tabcolinfo);
+        ArrayList<Boolean>isnull = new ArrayList<>();
+        for(int i=0;i<tabcolinfo.numCols;++i)
+            if(tabcolinfo.colDataTypes.get(i).getDataTypeAsInt()!=9)
+                isnull.add(false);
+            else if(((String)colData.get(i)).equals(""))
+                isnull.add(true);
+        byte[] record = buildRecord(colData,tabcolinfo,isnull);
     }
     
     private void insertQueryExecute() throws NoSuchTableException{
@@ -132,23 +139,170 @@ public class insertQueryHandler {
         return colData;
     }
     
-    private byte[] buildRecord(ArrayList<Object> colData, TableColumnInfo tci){
-        int totSize=0;
+    private byte[] buildRecord(ArrayList<Object> colData, TableColumnInfo tci,ArrayList<Boolean> isnull){
+        //fill in record using ByteBuffer.putInt and all
+        ArrayList<Byte> recordData = new ArrayList<>();
+        //header
+        recordData.add((byte)0x00);recordData.add((byte)0x00);
+        int rowid = (Integer)colData.get(0);
+        ByteBuffer intbuffer = ByteBuffer.allocate(4);
+        intbuffer.putInt(rowid);
+        for(Byte b:intbuffer.array())
+            recordData.add(b);
+        
+        //payload
+        recordData.add((byte)tci.numCols);
+        //write serial type codes
+        for(int i=0;i<tci.numCols;++i)
+            switch(tci.colDataTypes.get(i).getDataTypeAsInt()){
+                case 1:
+                    if(isnull.get(i))
+                        recordData.add((byte)0x00);
+                    else
+                        recordData.add((byte)0x04);
+                    break;
+                case 2:
+                    if(isnull.get(i))
+                        recordData.add((byte)0x01);
+                    else
+                        recordData.add((byte)0x05);
+                    break;
+                case 3:
+                    if(isnull.get(i))
+                        recordData.add((byte)0x02);
+                    else
+                        recordData.add((byte)0x06);
+                    break;
+                case 4:
+                    if(isnull.get(i))
+                        recordData.add((byte)0x03);
+                    else
+                        recordData.add((byte)0x07);
+                    break;
+                case 5:
+                    if(isnull.get(i))
+                        recordData.add((byte)0x02);
+                    else
+                        recordData.add((byte)0x08);
+                    break;
+                case 6:
+                    if(isnull.get(i))
+                        recordData.add((byte)0x03);
+                    else
+                        recordData.add((byte)0x09);
+                    break;
+                case 7:
+                    if(isnull.get(i))
+                        recordData.add((byte)0x03);
+                    else
+                        recordData.add((byte)0x0a);
+                    break;
+                case 8:
+                    if(isnull.get(i))
+                        recordData.add((byte)0x03);
+                    else
+                        recordData.add((byte)0x0b);
+                    break;
+                case 9:
+                    if(isnull.get(i))
+                        recordData.add((byte)0x0c);
+                    else
+                        recordData.add((byte)(0x0c + ((String)colData.get(i)).length()));
+                    break;
+            }
+        
+        //write binary column data
         for(int i=0;i<tci.numCols;++i){
             switch(tci.colDataTypes.get(i).getDataTypeAsInt()){
-                case 9: int len = ((String)colData.get(i)).length();
-                        if(len==0)
-                            ++totSize;
-                        else
-                            totSize += len;
-                        break;
-                default: totSize += tci.colDataTypes.get(i).getDataTypeSize();break;
+                case 1:
+                    if(isnull.get(i))
+                        recordData.add((byte)0x00);
+                    else
+                        recordData.add((Byte)colData.get(i));
+                    break;
+                case 2:
+                    if(isnull.get(i)){
+                        recordData.add((byte)0x00);recordData.add((byte)0x00);
+                    }else{
+                        short sdata = (Short)colData.get(i);
+                        ByteBuffer shortbuffer = ByteBuffer.allocate(2);
+                        shortbuffer.putShort(sdata);
+                        for(Byte b:shortbuffer.array())
+                            recordData.add(b);
+                    }
+                    break;
+                case 3:
+                    if(isnull.get(i)){
+                        recordData.add((byte)0x00);recordData.add((byte)0x00);
+                        recordData.add((byte)0x00);recordData.add((byte)0x00);
+                    }else{
+                        int idata = (Integer)colData.get(i);
+                        intbuffer = ByteBuffer.allocate(4);
+                        intbuffer.putInt(idata);
+                        for(Byte b:intbuffer.array())
+                            recordData.add(b);
+                    }
+                    break;
+                case 4:
+                case 7:
+                case 8:
+                    if(isnull.get(i)){
+                        recordData.add((byte)0x00);recordData.add((byte)0x00);
+                        recordData.add((byte)0x00);recordData.add((byte)0x00);
+                        recordData.add((byte)0x00);recordData.add((byte)0x00);
+                        recordData.add((byte)0x00);recordData.add((byte)0x00);
+                    }else{
+                        long ldata = (Long)colData.get(i);
+                        ByteBuffer longbuffer = ByteBuffer.allocate(8);
+                        longbuffer.putLong(ldata);
+                        for(Byte b:longbuffer.array())
+                            recordData.add(b);
+                    }
+                    break;
+                case 5:
+                    if(isnull.get(i)){
+                        recordData.add((byte)0x00);recordData.add((byte)0x00);
+                        recordData.add((byte)0x00);recordData.add((byte)0x00);
+                    }else{
+                        float fdata = (Float)colData.get(i);
+                        ByteBuffer floatbuffer = ByteBuffer.allocate(4);
+                        floatbuffer.putFloat(fdata);
+                        for(Byte b:floatbuffer.array())
+                            recordData.add(b);
+                    }
+                    break;
+                case 6:
+                    if(isnull.get(i)){
+                        recordData.add((byte)0x00);recordData.add((byte)0x00);
+                        recordData.add((byte)0x00);recordData.add((byte)0x00);
+                        recordData.add((byte)0x00);recordData.add((byte)0x00);
+                        recordData.add((byte)0x00);recordData.add((byte)0x00);
+                    }else{
+                        double ddata = (Double)colData.get(i);
+                        ByteBuffer doublebuffer = ByteBuffer.allocate(8);
+                        doublebuffer.putDouble(ddata);
+                        for(Byte b:doublebuffer.array())
+                            recordData.add(b);
+                    }
+                    break;
+                case 9:
+                    if(isnull.get(i))
+                        recordData.add((byte)0x00);
+                    else
+                        for(Byte b:((String)colData.get(i)).getBytes())
+                            recordData.add(b);
             }
         }
-        byte[] record = new byte[totSize];
+        short payloadsize = (short)(recordData.size()-6);
+        ByteBuffer shortbuffer = ByteBuffer.allocate(2);
+        shortbuffer.putShort(payloadsize);
+        byte[] plsize = shortbuffer.array();
+        recordData.set(0,plsize[0]);
+        recordData.set(1,plsize[1]);
         
-        //fill in record using ByteBuffer.putInt and all
-        
+        byte[] record = new byte[recordData.size()];
+        for(int i=0;i<recordData.size();++i)
+            record[i] = recordData.get(i);
         return record;
     }
     
