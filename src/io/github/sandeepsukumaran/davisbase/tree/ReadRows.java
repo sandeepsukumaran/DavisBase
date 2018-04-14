@@ -183,6 +183,7 @@ public class ReadRows {
                     //all data in a single record read
                     rs.data.add(rsr);
                 }
+                curPage = nextPage;
             }
         }catch(InvalidTableInformationException | IOException e){throw new FileAccessException();
         }catch(MissingTableFileException e){throw e;}
@@ -398,6 +399,7 @@ public class ReadRows {
                         rs.data.add(rsr);
                     else;
                 }
+                curPage = nextPage;
             }
         }catch(InvalidTableInformationException | IOException e){throw new FileAccessException();
         }catch(MissingTableFileException e){throw e;
@@ -558,6 +560,7 @@ public class ReadRows {
                     //all data in a single record read
                     rs.data.add(rsr);
                 }
+                curPage = nextPage;
             }
         }catch(InvalidTableInformationException | IOException e){throw new FileAccessException();
         }catch(MissingTableFileException e){throw e;}
