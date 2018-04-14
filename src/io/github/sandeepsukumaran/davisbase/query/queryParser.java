@@ -16,14 +16,19 @@
  */
 package io.github.sandeepsukumaran.davisbase.query;
 
+import io.github.sandeepsukumaran.davisbase.exception.ArgumentCountMismatchException;
+import io.github.sandeepsukumaran.davisbase.exception.BadInputValueException;
+import io.github.sandeepsukumaran.davisbase.exception.ColumnCannotBeNullException;
 import io.github.sandeepsukumaran.davisbase.exception.FileAccessException;
 import io.github.sandeepsukumaran.davisbase.exception.InvalidDataType;
 import io.github.sandeepsukumaran.davisbase.exception.InvalidQuerySyntaxException;
+import io.github.sandeepsukumaran.davisbase.exception.InvalidTableInformationException;
 import io.github.sandeepsukumaran.davisbase.exception.MissingTableFileException;
 import io.github.sandeepsukumaran.davisbase.main.DavisBase;
 import io.github.sandeepsukumaran.davisbase.exception.NoDatabaseSelectedException;
 import io.github.sandeepsukumaran.davisbase.exception.NoSuchColumnException;
 import io.github.sandeepsukumaran.davisbase.exception.NoSuchTableException;
+import java.io.IOException;
 /**
  *
  * @author Sandeep
@@ -39,8 +44,13 @@ public class queryParser {
      * @throws io.github.sandeepsukumaran.davisbase.exception.FileAccessException
      * @throws io.github.sandeepsukumaran.davisbase.exception.MissingTableFileException
      * @throws io.github.sandeepsukumaran.davisbase.exception.InvalidDataType
+     * @throws io.github.sandeepsukumaran.davisbase.exception.ArgumentCountMismatchException
+     * @throws io.github.sandeepsukumaran.davisbase.exception.BadInputValueException
+     * @throws io.github.sandeepsukumaran.davisbase.exception.InvalidTableInformationException
+     * @throws java.io.IOException
+     * @throws io.github.sandeepsukumaran.davisbase.exception.ColumnCannotBeNullException
      */
-    public static void parseInputCommand(String inputCommand) throws NoDatabaseSelectedException,InvalidQuerySyntaxException,NoSuchTableException,NoSuchColumnException, FileAccessException, MissingTableFileException, InvalidDataType{
+    public static void parseInputCommand(String inputCommand) throws NoDatabaseSelectedException,InvalidQuerySyntaxException,NoSuchTableException,NoSuchColumnException, FileAccessException, MissingTableFileException, InvalidDataType, ArgumentCountMismatchException, BadInputValueException, InvalidTableInformationException, IOException, ColumnCannotBeNullException{
         switch(inputCommand){
             case EXIT_COMMAND:
                 io.github.sandeepsukumaran.davisbase.main.DavisBase.exitFlag = true;

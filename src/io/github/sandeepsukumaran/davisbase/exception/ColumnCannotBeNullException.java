@@ -20,11 +20,8 @@ package io.github.sandeepsukumaran.davisbase.exception;
  *
  * @author Sandeep
  */
-public class NoSuchColumnException extends Exception{
-    public NoSuchColumnException(String columnName, String tableName){
-        super("No attribute "+columnName+" in table "+tableName+" in current database.");
-    }
-    public NoSuchColumnException(String columnName){
-        super("No attribute "+columnName+" in table in current database.");
+public class ColumnCannotBeNullException extends Exception{
+    public ColumnCannotBeNullException(String colName){
+        super("Value missing for non-nullable attribute "+colName);
     }
 }

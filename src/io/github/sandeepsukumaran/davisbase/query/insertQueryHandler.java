@@ -18,15 +18,23 @@ package io.github.sandeepsukumaran.davisbase.query;
 
 import io.github.sandeepsukumaran.davisbase.exception.ArgumentCountMismatchException;
 import io.github.sandeepsukumaran.davisbase.exception.BadInputValueException;
+import io.github.sandeepsukumaran.davisbase.exception.ColumnCannotBeNullException;
 import io.github.sandeepsukumaran.davisbase.exception.InvalidQuerySyntaxException;
+import io.github.sandeepsukumaran.davisbase.exception.InvalidTableInformationException;
+import io.github.sandeepsukumaran.davisbase.exception.MissingTableFileException;
+import io.github.sandeepsukumaran.davisbase.exception.NoSuchColumnException;
 import io.github.sandeepsukumaran.davisbase.exception.NoSuchTableException;
+import io.github.sandeepsukumaran.davisbase.helpermethods.HelperMethods;
 import io.github.sandeepsukumaran.davisbase.main.DavisBase;
 import io.github.sandeepsukumaran.davisbase.tableinformation.TableColumnInfo;
+import io.github.sandeepsukumaran.davisbase.tree.InsertRecord;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -49,8 +57,12 @@ public class insertQueryHandler {
      * @throws io.github.sandeepsukumaran.davisbase.exception.NoSuchTableException
      * @throws io.github.sandeepsukumaran.davisbase.exception.ArgumentCountMismatchException
      * @throws io.github.sandeepsukumaran.davisbase.exception.BadInputValueException
+     * @throws io.github.sandeepsukumaran.davisbase.exception.InvalidTableInformationException
+     * @throws java.io.IOException
+     * @throws io.github.sandeepsukumaran.davisbase.exception.NoSuchColumnException
+     * @throws io.github.sandeepsukumaran.davisbase.exception.ColumnCannotBeNullException
      */
-    public void execute() throws InvalidQuerySyntaxException, NoSuchTableException, ArgumentCountMismatchException, BadInputValueException{
+    public void execute() throws InvalidQuerySyntaxException, NoSuchTableException, ArgumentCountMismatchException, BadInputValueException, InvalidTableInformationException, IOException, NoSuchColumnException, ColumnCannotBeNullException{
         if (insertAllMatcher.matches()){
             //select all query
             insertAllQueryExecute();
@@ -62,7 +74,7 @@ public class insertQueryHandler {
             throw new InvalidQuerySyntaxException();
     }
     
-    private void insertAllQueryExecute() throws NoSuchTableException, ArgumentCountMismatchException, BadInputValueException{
+    private void insertAllQueryExecute() throws NoSuchTableException, ArgumentCountMismatchException, BadInputValueException, InvalidTableInformationException, IOException{
         ArrayList<String> tableNames = DavisBase.getTableNames();
         String tableName = insertAllMatcher.group("tablename");
         if (!tableNames.contains(tableName))
@@ -80,17 +92,10 @@ public class insertQueryHandler {
             else if(((String)colData.get(i)).equals(""))
                 isnull.add(true);
         byte[] record = buildRecord(colData,tabcolinfo,isnull);
-    }
-    
-    private void insertQueryExecute() throws NoSuchTableException{
-        ArrayList<String> tableNames = DavisBase.getTableNames();
-        String tableName = insertMatcher.group("tablename");
-        if (!tableNames.contains(tableName))
-            throw new NoSuchTableException(tableName);
-        else;
-        TableColumnInfo tabcolinfo = DavisBase.getTableInfo(tableName);
-        String cols = insertAllMatcher.group("columns");
-        String values = insertAllMatcher.group("values");
+        int rowid = (Integer)colData.get(0);
+        try{
+            InsertRecord.writeRecordToFile(tableName,record,rowid);
+        }catch(MissingTableFileException|FileNotFoundException e){throw new NoSuchTableException(tableName);}
     }
     
     private ArrayList<Object> parseValues(TableColumnInfo tci, String values) throws ArgumentCountMismatchException, BadInputValueException{
@@ -137,6 +142,95 @@ public class insertQueryHandler {
             }
         }catch(NumberFormatException|ParseException e){throw new BadInputValueException();}
         return colData;
+    }
+    
+    private void insertQueryExecute() throws NoSuchTableException, ArgumentCountMismatchException, BadInputValueException, InvalidTableInformationException, IOException, NoSuchColumnException, ColumnCannotBeNullException{
+        ArrayList<String> tableNames = DavisBase.getTableNames();
+        String tableName = insertMatcher.group("tablename");
+        if (!tableNames.contains(tableName))
+            throw new NoSuchTableException(tableName);
+        else;
+        TableColumnInfo tabcolinfo = DavisBase.getTableInfo(tableName);
+        String cols = insertAllMatcher.group("colnames");
+        String values = insertAllMatcher.group("values");
+        cols = cols.substring(1, cols.length());//ignore first and last ( and )
+        ArrayList<String>colnames = new ArrayList<>(Arrays.asList(cols.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1)));
+        colnames = HelperMethods.uniqueStringArrayList(colnames);
+        
+        ParseResult parseres = parseValues(tabcolinfo,colnames,values);
+        byte[] record = buildRecord(parseres.getColData(),tabcolinfo,parseres.getIsNull());
+        int rowid = (Integer)parseres.getColData().get(0);
+        try{
+            InsertRecord.writeRecordToFile(tableName,record,rowid);
+        }catch(MissingTableFileException|FileNotFoundException e){throw new NoSuchTableException(tableName);}
+    }
+    
+    private ParseResult parseValues(TableColumnInfo tci,ArrayList<String>colNames, String values) throws ArgumentCountMismatchException, BadInputValueException, NoSuchColumnException, ColumnCannotBeNullException{
+        ArrayList<Object> colData = new ArrayList<>();
+        ArrayList<Boolean> isnull = new ArrayList<>();
+        values = values.substring(1,values.length());//ignore first and last ( and )
+        //split on commas outside double quotation marks
+        String[] tokens = values.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1);
+        if(tokens.length != colNames.size())
+            throw new ArgumentCountMismatchException();
+        else;
+        
+        if (!tci.colNames.containsAll(colNames)){
+            //not all provided columns are in the table
+            colNames.removeAll(tci.colNames);
+            throw new NoSuchColumnException(colNames.get(0));
+        }else;
+        
+        SimpleDateFormat simpleDateTimeFormat = new SimpleDateFormat("YYYY-MM-DD_hh:mm:ss");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYY-MM-DD");
+        try{
+            for(int col=0;col<tci.numCols;++col){
+                int inputindex = colNames.indexOf(tci.colNames.get(col));
+                if(inputindex==-1)//value has not been given in insert
+                    if(tci.colNullable.get(col)){//column can be null
+                        isnull.add(true);
+                        colData.add(0x00); //value will be ignored when inserting
+                        continue;
+                    }else//column cannot be null
+                        throw new ColumnCannotBeNullException(tci.colNames.get(col));
+                else//value has been given for inserting
+                    isnull.add(false);
+                switch(tci.colDataTypes.get(col).getDataTypeAsInt()){
+                    case 1:
+                        colData.add(Byte.parseByte(tokens[inputindex]));
+                        break;
+                    case 2:
+                        colData.add(Short.parseShort(tokens[inputindex]));
+                        break;
+                    case 3:
+                        colData.add(Integer.parseInt(tokens[inputindex]));
+                        break;
+                    case 4:
+                        colData.add(Long.parseLong(tokens[inputindex]));
+                        break;
+                    case 5:
+                        colData.add(Float.parseFloat(tokens[inputindex]));
+                        break;
+                    case 6:
+                        colData.add(Double.parseDouble(tokens[inputindex]));
+                        break;
+                    case 7:
+                        colData.add(simpleDateTimeFormat.parse(tokens[inputindex]).getTime());
+                        break;
+                    case 8:
+                        colData.add(simpleDateFormat.parse(tokens[inputindex]).getTime());
+                        break;
+                    case 9:
+                        colData.add(tokens[inputindex]);
+                        break;
+                }
+            }
+        }catch(NumberFormatException|ParseException e){throw new BadInputValueException();}
+        
+        ParseResult parseres = new ParseResult();
+        parseres.colData = colData;
+        parseres.isnull = isnull;
+        return parseres;
     }
     
     private byte[] buildRecord(ArrayList<Object> colData, TableColumnInfo tci,ArrayList<Boolean> isnull){
@@ -313,4 +407,14 @@ public class insertQueryHandler {
     private final String query;
     private final String INSERT_ALL_QUERY = "^insert into (?<tablename>\\w+)\\p{javaWhitespace}*values\\p{javaWhitespace}*(?<values>\\((\\d+(\\.\\d+)?)|(\"(\\p{Punct}&&[^\"\'])+\")(\\p{javaWhitespace}*,\\p{javaWhitespace}*(\\d+(\\.\\d+)?)|\"(\\p{Punct}&&[^\"\'])+\")*\\));$";
     private final String INSERT_QUERY = "^insert into (?<tablename>\\w+)\\p{javaWhitespace}*(?<colnames>\\(\\w+(\\p{javaWhitespace}*,\\p{javaWhitespace}*\\w+)*\\))\\p{javaWhitespace}*values\\p{javaWhitespace}*(?<values>\\((\\d+(\\.\\d+)?)|(\"(\\p{Punct}&&[^\"\'])+\")(\\p{javaWhitespace}*,\\p{javaWhitespace}*(\\d+(\\.\\d+)?)|\"(\\p{Punct}&&[^\"\'])+\")*\\));$";
+}
+
+class ParseResult{
+    ParseResult(){}
+    
+    ArrayList<Object> getColData(){return colData;}
+    ArrayList<Boolean> getIsNull(){return isnull;}
+    
+    ArrayList<Object> colData;
+    ArrayList<Boolean> isnull;
 }

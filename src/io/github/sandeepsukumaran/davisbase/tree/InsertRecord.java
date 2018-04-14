@@ -31,7 +31,17 @@ import java.io.RandomAccessFile;
 public class InsertRecord {
     public InsertRecord(){}
     
-    private void writeRecordToFile(String tableName,byte[] record,int row_id) throws MissingTableFileException, InvalidTableInformationException, FileNotFoundException, IOException{
+    /**
+     *
+     * @param tableName
+     * @param record
+     * @param row_id
+     * @throws MissingTableFileException
+     * @throws InvalidTableInformationException
+     * @throws FileNotFoundException
+     * @throws IOException
+     */
+    public static void writeRecordToFile(String tableName,byte[] record,int row_id) throws MissingTableFileException, InvalidTableInformationException, FileNotFoundException, IOException{
         String workingDirectory = System.getProperty("user.dir"); // gets current working directory
             String absoluteFilePath = workingDirectory + File.separator + "data" + File.separator + "user_data" + File.separator + tableName+".tbl";
             File file = new File(absoluteFilePath);
@@ -54,7 +64,7 @@ public class InsertRecord {
             tableFile.close();
     }
     
-    private void writeRecordToFirstPage(RandomAccessFile tableFile, byte[] record,int row_id,String tableName) throws IOException{
+    private static void writeRecordToFirstPage(RandomAccessFile tableFile, byte[] record,int row_id,String tableName) throws IOException{
         tableFile.skipBytes(1);//skip over page type - will be0x0d
         short numCols = tableFile.readByte();
         short cellStart = tableFile.readShort();
@@ -101,7 +111,7 @@ public class InsertRecord {
         UpdateRecord.incrementRecordCount(tableName);
     }
     
-    private void writeRecordToPage(RandomAccessFile tableFile, byte[] record, int pageNum,int row_id,String tableName) throws IOException{
+    private static void writeRecordToPage(RandomAccessFile tableFile, byte[] record, int pageNum,int row_id,String tableName) throws IOException{
         if(pageNum==3)
             pageNum=2;
         else;

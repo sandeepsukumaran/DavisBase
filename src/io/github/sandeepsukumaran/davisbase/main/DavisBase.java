@@ -5,9 +5,13 @@
  */
 package io.github.sandeepsukumaran.davisbase.main;
 
+import io.github.sandeepsukumaran.davisbase.exception.ArgumentCountMismatchException;
+import io.github.sandeepsukumaran.davisbase.exception.BadInputValueException;
+import io.github.sandeepsukumaran.davisbase.exception.ColumnCannotBeNullException;
 import io.github.sandeepsukumaran.davisbase.exception.FileAccessException;
 import io.github.sandeepsukumaran.davisbase.exception.InvalidDataType;
 import io.github.sandeepsukumaran.davisbase.exception.InvalidQuerySyntaxException;
+import io.github.sandeepsukumaran.davisbase.exception.InvalidTableInformationException;
 import io.github.sandeepsukumaran.davisbase.exception.MissingTableFileException;
 import java.util.Scanner;
 
@@ -93,7 +97,7 @@ public class DavisBase {
                 queryParser.parseInputCommand(inputString);
             }catch(NoDatabaseSelectedException e){
                 System.out.println("\nERROR 1046 : No database selected.");
-            }catch(InvalidQuerySyntaxException|NoSuchTableException|NoSuchColumnException|FileAccessException|MissingTableFileException|InvalidDataType e){
+            }catch(InvalidQuerySyntaxException|NoSuchTableException|NoSuchColumnException|FileAccessException|MissingTableFileException|InvalidDataType|ArgumentCountMismatchException | BadInputValueException | InvalidTableInformationException | IOException | ColumnCannotBeNullException e){
                 System.out.println(e);
             }
         }

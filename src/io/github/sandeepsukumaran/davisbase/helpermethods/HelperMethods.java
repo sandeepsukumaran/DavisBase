@@ -14,17 +14,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package io.github.sandeepsukumaran.davisbase.exception;
+package io.github.sandeepsukumaran.davisbase.helpermethods;
+
+import java.util.ArrayList;
 
 /**
  *
  * @author Sandeep
  */
-public class NoSuchColumnException extends Exception{
-    public NoSuchColumnException(String columnName, String tableName){
-        super("No attribute "+columnName+" in table "+tableName+" in current database.");
+public class HelperMethods {
+    public static ArrayList<Object> uniqueArrayList(ArrayList<Object> ip){
+        ArrayList<Object> result = new ArrayList<>();
+        for(Object e:ip)
+            if(!result.contains(e))
+                result.add(e);
+        return result;
     }
-    public NoSuchColumnException(String columnName){
-        super("No attribute "+columnName+" in table in current database.");
+    public static ArrayList<String> uniqueStringArrayList(ArrayList<String> ip){
+        ArrayList<String> result = new ArrayList<>();
+        for(String e:ip)
+            if(!result.contains(e))
+                result.add(e);
+        return result;
     }
 }
