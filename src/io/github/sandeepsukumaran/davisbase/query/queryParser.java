@@ -17,6 +17,7 @@
 package io.github.sandeepsukumaran.davisbase.query;
 
 import io.github.sandeepsukumaran.davisbase.exception.FileAccessException;
+import io.github.sandeepsukumaran.davisbase.exception.InvalidDataType;
 import io.github.sandeepsukumaran.davisbase.exception.InvalidQuerySyntaxException;
 import io.github.sandeepsukumaran.davisbase.exception.MissingTableFileException;
 import io.github.sandeepsukumaran.davisbase.main.DavisBase;
@@ -37,8 +38,9 @@ public class queryParser {
      * @throws io.github.sandeepsukumaran.davisbase.exception.NoSuchColumnException
      * @throws io.github.sandeepsukumaran.davisbase.exception.FileAccessException
      * @throws io.github.sandeepsukumaran.davisbase.exception.MissingTableFileException
+     * @throws io.github.sandeepsukumaran.davisbase.exception.InvalidDataType
      */
-    public static void parseInputCommand(String inputCommand) throws NoDatabaseSelectedException,InvalidQuerySyntaxException,NoSuchTableException,NoSuchColumnException, FileAccessException, MissingTableFileException{
+    public static void parseInputCommand(String inputCommand) throws NoDatabaseSelectedException,InvalidQuerySyntaxException,NoSuchTableException,NoSuchColumnException, FileAccessException, MissingTableFileException, InvalidDataType{
         switch(inputCommand){
             case EXIT_COMMAND:
                 io.github.sandeepsukumaran.davisbase.main.DavisBase.exitFlag = true;
@@ -111,7 +113,7 @@ public class queryParser {
     //static final String SHOW_DATABASES_COMMAND = "show databases";
     
     //regex for valid commands
-    static final String SELECT_QUERY = "select \\*|(\\w+(\\p{javaWhitespace}?,\\p{javaWhitespace}?\\w+)*) from \\w+ (where \\w+\\p{javaWhitespace}?=\\p{javaWhitespace}?((\\d+(\\.\\d+)?)|\"(\\p{Punct}&&[^\"\'])+\"))?;";
+    static final String SELECT_QUERY = "select (\\*)|(\\w+(\\p{javaWhitespace}?,\\p{javaWhitespace}?\\w+)*) from (\\w+) (where\\p{javaWhitespace}+\\w+(\\p{javaWhitespace}*(=|<=|<|>|>=|<>)\\p{javaWhitespace}*((\\d+(\\.\\d+)?)|\"(\\p{Punct}&&[^\"\'])+\"))|(\\p{javaWhitespace}+is null)|(\\p{javaWhitespace}+is not null))?;";
     static final String INSERT_QUERY = "insert into \\w+\\p{javaWhitespace}*(\\(\\w+(\\p{javaWhitespace}*,\\p{javaWhitespace}*\\w+)*\\))?\\p{javaWhitespace}*values\\p{javaWhitespace}*\\((\\d+(\\.\\d+)?)|(\"(\\p{Punct}&&[^\"\'])+\")(\\p{javaWhitespace}*,\\p{javaWhitespace}*(\\d+(\\.\\d+)?)|\"(\\p{Punct}&&[^\"\'])+\")*\\);";
     static final String UPDATE_QUERY = "update \\w+ set \\w+\\p{javaWhitespace}*=\\p{javaWhitespace}*(\\d+(\\.\\d+)?)|(\"(\\p{Punct}&&[^\"\'])+\") \\p{javaWhitespace}*(where \\w+(\\p{javaWhitespace}*=\\p{javaWhitespace}*((\\d+(\\.\\d+)?)|(\"(\\p{Punct}&&[^\"\'])+\")))|(\\p{javaWhitespace}+is null)|((\\p{javaWhitespace}+is not null)))?;";
 }
