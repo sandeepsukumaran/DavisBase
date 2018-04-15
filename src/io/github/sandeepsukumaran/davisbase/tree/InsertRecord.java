@@ -43,25 +43,25 @@ public class InsertRecord {
      */
     public static void writeRecordToFile(String tableName,byte[] record,int row_id) throws MissingTableFileException, InvalidTableInformationException, FileNotFoundException, IOException{
         String workingDirectory = System.getProperty("user.dir"); // gets current working directory
-            String absoluteFilePath = workingDirectory + File.separator + "data" + File.separator + "user_data" + File.separator + tableName+".tbl";
-            File file = new File(absoluteFilePath);
-            if (!(file.exists() && !file.isDirectory())){
-                throw new MissingTableFileException(tableName);
-            }else;
-        
-            RandomAccessFile tableFile = new RandomAccessFile(absoluteFilePath, "rw");
-            
-            if(tableFile.length() < DavisBase.PAGESIZE) //invalid file
-                throw new InvalidTableInformationException(tableName);
-            else;
-            
-            int numPages = (int)(tableFile.length()/DavisBase.PAGESIZE);
-            if(numPages==1)
-                writeRecordToFirstPage(tableFile,record,row_id,tableName);
-            else
-                writeRecordToPage(tableFile,record,numPages,row_id,tableName);
-            
-            tableFile.close();
+        String absoluteFilePath = workingDirectory + File.separator + "data" + File.separator + "user_data" + File.separator + tableName+".tbl";
+        File file = new File(absoluteFilePath);
+        if (!(file.exists() && !file.isDirectory())){
+            throw new MissingTableFileException(tableName);
+        }else;
+
+        RandomAccessFile tableFile = new RandomAccessFile(absoluteFilePath, "rw");
+
+        if(tableFile.length() < DavisBase.PAGESIZE) //invalid file
+            throw new InvalidTableInformationException(tableName);
+        else;
+
+        int numPages = (int)(tableFile.length()/DavisBase.PAGESIZE);
+        if(numPages==1)
+            writeRecordToFirstPage(tableFile,record,row_id,tableName);
+        else
+            writeRecordToPage(tableFile,record,numPages,row_id,tableName);
+
+        tableFile.close();
     }
     
     private static void writeRecordToFirstPage(RandomAccessFile tableFile, byte[] record,int row_id,String tableName) throws IOException, MissingTableFileException, FileNotFoundException, InvalidTableInformationException{

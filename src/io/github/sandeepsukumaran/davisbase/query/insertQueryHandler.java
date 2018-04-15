@@ -234,7 +234,14 @@ public class insertQueryHandler {
         return parseres;
     }
     
-    private byte[] buildRecord(ArrayList<Object> colData, TableColumnInfo tci,ArrayList<Boolean> isnull){
+    /**
+     *
+     * @param colData
+     * @param tci
+     * @param isnull
+     * @return
+     */
+    public static byte[] buildRecord(ArrayList<Object> colData, TableColumnInfo tci,ArrayList<Boolean> isnull){
         //fill in record using ByteBuffer.putInt and all
         ArrayList<Byte> recordData = new ArrayList<>();
         //header
@@ -248,7 +255,7 @@ public class insertQueryHandler {
         //payload
         recordData.add((byte)tci.numCols);
         //write serial type codes
-        for(int i=0;i<tci.numCols;++i)
+        for(int i=1;i<tci.numCols;++i)
             switch(tci.colDataTypes.get(i).getDataTypeAsInt()){
                 case 1:
                     if(isnull.get(i))
@@ -307,7 +314,7 @@ public class insertQueryHandler {
             }
         
         //write binary column data
-        for(int i=0;i<tci.numCols;++i){
+        for(int i=1;i<tci.numCols;++i){
             switch(tci.colDataTypes.get(i).getDataTypeAsInt()){
                 case 1:
                     if(isnull.get(i))

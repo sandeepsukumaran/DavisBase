@@ -45,7 +45,21 @@ public class DataType {
     public static int getDataTypeSize(String dType){
         return DATATYPESIZE.get(DATATYPEINDEX.get(dType));
     }
-    
+    @Override
+    public String toString(){
+        switch(type){
+            case 1: return "tinyint";
+            case 2: return "smallint";
+            case 3: return "int";
+            case 4: return "bigint";
+            case 5: return "real";
+            case 6: return "double";
+            case 7: return "datetime";
+            case 8: return "date";
+            case 9: return "text";
+        }
+        return "";
+    }
     public static String dataAsString(int type, int val){
         switch(type){
             case 1:
