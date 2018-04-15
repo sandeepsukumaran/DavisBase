@@ -16,14 +16,24 @@
  */
 package io.github.sandeepsukumaran.davisbase.helpermethods;
 
+import io.github.sandeepsukumaran.davisbase.datatype.DataType;
 import io.github.sandeepsukumaran.davisbase.exception.InvalidTableInformationException;
 import io.github.sandeepsukumaran.davisbase.exception.MissingTableFileException;
 import io.github.sandeepsukumaran.davisbase.main.DavisBase;
+import io.github.sandeepsukumaran.davisbase.query.createQueryHandler;
+import static io.github.sandeepsukumaran.davisbase.query.createQueryHandler.TABLECOLMETADATACOLDATATYPES;
+import static io.github.sandeepsukumaran.davisbase.query.createQueryHandler.TABLECOLMETADATACOLNAMES;
+import static io.github.sandeepsukumaran.davisbase.query.createQueryHandler.TABLECOLMETADATACOLNULLABLE;
+import static io.github.sandeepsukumaran.davisbase.query.createQueryHandler.TABLECOLMETADATANUMCOLS;
+import io.github.sandeepsukumaran.davisbase.query.insertQueryHandler;
+import io.github.sandeepsukumaran.davisbase.tableinformation.TableColumnInfo;
 import io.github.sandeepsukumaran.davisbase.tree.UpdateRecord;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  *
@@ -154,5 +164,167 @@ public class HelperMethods {
             tableFile.writeInt(pageNum);
             tableFile.writeInt(row_id);
         }
+    }
+
+    public static void writeInitialMetaDataFiles() throws MissingTableFileException, IOException, FileNotFoundException, InvalidTableInformationException{
+        writeInitialMetaDataTablesFile();
+        writeInitialMetaDataColumnsFile();
+    }
+
+    public static void writeInitialMetaDataTablesFile() throws MissingTableFileException, FileNotFoundException, IOException{
+        String workingDirectory = System.getProperty("user.dir"); // gets current working directory
+	String absoluteFilePath = workingDirectory + File.separator + "data" + File.separator + "catalog" + File.separator + "davisbase_tables.tbl";
+	File file = new File(absoluteFilePath);
+        if (!(file.exists() && !file.isDirectory())){
+            System.out.println("Table Metadata Information has been deleted. Cannot guarantee proper execution.");
+            throw new MissingTableFileException("davisbase_tables");
+        }else;
+        
+        RandomAccessFile catalogTableFile = new RandomAccessFile(absoluteFilePath, "rw");
+        catalogTableFile.setLength(DavisBase.PAGESIZE);
+        
+        catalogTableFile.seek(0);
+        catalogTableFile.writeByte(0x0d); //leaf page
+        catalogTableFile.writeByte(2); //number of cells
+        catalogTableFile.skipBytes(2); //cell start
+        catalogTableFile.writeInt(-1); //right sibling
+        
+        ArrayList<Object> insertionData = new ArrayList<>();
+        insertionData.add((Integer)(1));
+        insertionData.add("davisbase_tables");
+        insertionData.add((Integer)(2));
+        insertionData.add((Integer)(1));
+        
+        TableColumnInfo tci = new TableColumnInfo();
+        tci.numCols = createQueryHandler.TABLEMETADATANUMCOLS;
+        tci.colNames = new ArrayList<>(Arrays.asList(createQueryHandler.TABLEMETADATACOLNAMES));
+        tci.colDataTypes = new ArrayList<>(Arrays.asList(createQueryHandler.TABLEMETADATACOLDATATYPES));
+        tci.colNullable = new ArrayList<>(Arrays.asList(createQueryHandler.TABLEMETADATACOLNULLABLE));
+        
+        byte[] record = insertQueryHandler.buildRecord(insertionData, tci, tci.colNullable);
+        catalogTableFile.seek(DavisBase.PAGESIZE - record.length);
+        long pos = catalogTableFile.getFilePointer();
+        catalogTableFile.seek(8);
+        catalogTableFile.writeShort((short)pos);
+        catalogTableFile.seek(pos);
+        catalogTableFile.write(record);
+        
+        insertionData = new ArrayList<>();
+        insertionData.add((Integer)(2));
+        insertionData.add("davisbase_columns");
+        insertionData.add((Integer)(10));
+        insertionData.add((Integer)(1));
+        
+        record = insertQueryHandler.buildRecord(insertionData, tci, tci.colNullable);
+        catalogTableFile.seek(pos - record.length);
+        long pos1 = catalogTableFile.getFilePointer();
+        catalogTableFile.seek(10);
+        catalogTableFile.writeShort((short)pos1);
+        catalogTableFile.seek(2);
+        catalogTableFile.writeShort((short)pos1);//update cell start
+        catalogTableFile.seek(pos1);
+        catalogTableFile.write(record);
+        
+        catalogTableFile.close();
+    }
+    
+    public static void writeInitialMetaDataColumnsFile() throws MissingTableFileException, FileNotFoundException, IOException, InvalidTableInformationException{
+        String workingDirectory = System.getProperty("user.dir"); // gets current working directory
+	String absoluteFilePath = workingDirectory + File.separator + "data" + File.separator + "catalog" + File.separator + "davisbase_columns.tbl";
+	File file = new File(absoluteFilePath);
+        if (!(file.exists() && !file.isDirectory())){
+            System.out.println("Table Metadata Information has been deleted. Cannot guarantee proper execution.");
+            throw new MissingTableFileException("davisbase_columns");
+        }else;
+        
+        RandomAccessFile catalogTableColFile = new RandomAccessFile(absoluteFilePath, "rw");
+        catalogTableColFile.setLength(DavisBase.PAGESIZE);
+        
+        catalogTableColFile.seek(0);
+        catalogTableColFile.writeByte(0x0d); //leaf page
+        catalogTableColFile.writeByte(0x00); //number of cells
+        catalogTableColFile.writeShort((short)DavisBase.PAGESIZE); //cell start
+        catalogTableColFile.writeInt(-1); //right sibling
+        
+        //---------------------------------------------------------------------------------
+        TableColumnInfo tci = new TableColumnInfo();
+        tci.numCols = TABLECOLMETADATANUMCOLS;
+        tci.colNames = new ArrayList<>(Arrays.asList(TABLECOLMETADATACOLNAMES));
+        tci.colDataTypes = new ArrayList<>(Arrays.asList(TABLECOLMETADATACOLDATATYPES));
+        tci.colNullable = new ArrayList<>(Arrays.asList(TABLECOLMETADATACOLNULLABLE));
+        
+        int highestrow_id=0; int curPage=1; int numPages;
+        String tableName = "davisbase_tables";
+        ArrayList<String> colNames = new ArrayList<>();
+        ArrayList<DataType> colDataType = new ArrayList<>();
+        colNames.add("row_id"); colDataType.add(new DataType("int"));
+        colNames.add("table_name"); colDataType.add(new DataType("text"));
+        colNames.add("record_count"); colDataType.add(new DataType("int"));
+        colNames.add("root_page"); colDataType.add(new DataType("smallint"));
+        for(int i=0;i<colNames.size();++i){
+            ArrayList<Object> insertionData = new ArrayList<>();
+            insertionData.add((Integer)(highestrow_id+1+i));
+            insertionData.add(tableName);
+            insertionData.add(colNames.get(i));
+            insertionData.add(colDataType.get(i).toString());
+            insertionData.add((byte)i);
+            if(tci.colNullable.get(i))
+                insertionData.add("YES");
+            else
+                insertionData.add("NO");
+            
+            byte[] record = insertQueryHandler.buildRecord(insertionData, tci, tci.colNullable);
+            
+            if(curPage==1)
+                if(HelperMethods.writeRecordToFirstPage(catalogTableColFile, record, highestrow_id+1+i))
+                    UpdateRecord.setRootPage("davisbase_columns");
+            else
+                HelperMethods.writeRecordToPage(catalogTableColFile, record, curPage, highestrow_id+1+i);
+            
+            numPages = (int)(catalogTableColFile.length()/DavisBase.PAGESIZE);
+            if(numPages==3)
+                curPage=2;
+            else
+                curPage=numPages;
+        }
+        
+        highestrow_id += colNames.size();
+        tableName = "davisbase_columns";
+        colNames = new ArrayList<>();
+        colDataType = new ArrayList<>();
+        colNames.add("row_id"); colDataType.add(new DataType("int"));
+        colNames.add("table_name"); colDataType.add(new DataType("text"));
+        colNames.add("column_name"); colDataType.add(new DataType("text"));
+        colNames.add("data_type"); colDataType.add(new DataType("text"));
+        colNames.add("ordinal_position"); colDataType.add(new DataType("tinyint"));
+        colNames.add("is_nullable"); colDataType.add(new DataType("text"));
+        for(int i=0;i<colNames.size();++i){
+            ArrayList<Object> insertionData = new ArrayList<>();
+            insertionData.add((Integer)(highestrow_id+1+i));
+            insertionData.add(tableName);
+            insertionData.add(colNames.get(i));
+            insertionData.add(colDataType.get(i).toString());
+            insertionData.add((byte)i);
+            if(tci.colNullable.get(i))
+                insertionData.add("YES");
+            else
+                insertionData.add("NO");
+            
+            byte[] record = insertQueryHandler.buildRecord(insertionData, tci, tci.colNullable);
+            
+            if(curPage==1)
+                if(HelperMethods.writeRecordToFirstPage(catalogTableColFile, record, highestrow_id+1+i))
+                    UpdateRecord.setRootPage("davisbase_columns");
+            else
+                HelperMethods.writeRecordToPage(catalogTableColFile, record, curPage, highestrow_id+1+i);
+            
+            numPages = (int)(catalogTableColFile.length()/DavisBase.PAGESIZE);
+            if(numPages==3)
+                curPage=2;
+            else
+                curPage=numPages;
+        }
+        
+        catalogTableColFile.close();
     }
 }

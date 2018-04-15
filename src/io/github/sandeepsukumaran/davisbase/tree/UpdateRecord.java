@@ -34,7 +34,7 @@ public class UpdateRecord {
     
     public static void incrementRecordCount(String tableName) throws MissingTableFileException, FileNotFoundException, InvalidTableInformationException, IOException{
         String workingDirectory = System.getProperty("user.dir"); // gets current working directory
-        String absoluteFilePath = workingDirectory + File.separator + "data" + File.separator + "user_data" + File.separator + "davisbase_tables.tbl";
+        String absoluteFilePath = workingDirectory + File.separator + "data" + File.separator + "catalog" + File.separator + "davisbase_tables.tbl";
         File file = new File(absoluteFilePath);
         if (!(file.exists() && !file.isDirectory())){
             throw new MissingTableFileException("davisbase_tables");
@@ -42,7 +42,7 @@ public class UpdateRecord {
         
         RandomAccessFile tableFile = new RandomAccessFile(absoluteFilePath, "rw");
         if(tableFile.length() < DavisBase.PAGESIZE) //no meta data information found
-            throw new InvalidTableInformationException(tableName);
+            throw new InvalidTableInformationException("davisbase_tables");
         else;
         
         int curPage=1;
@@ -79,7 +79,7 @@ public class UpdateRecord {
     }
     public static void decrementRecordCount(String tableName) throws MissingTableFileException, FileNotFoundException, IOException, InvalidTableInformationException{
         String workingDirectory = System.getProperty("user.dir"); // gets current working directory
-        String absoluteFilePath = workingDirectory + File.separator + "data" + File.separator + "user_data" + File.separator + "davisbase_tables.tbl";
+        String absoluteFilePath = workingDirectory + File.separator + "data" + File.separator + "catalog" + File.separator + "davisbase_tables.tbl";
         File file = new File(absoluteFilePath);
         if (!(file.exists() && !file.isDirectory())){
             throw new MissingTableFileException("davisbase_tables");
@@ -87,7 +87,7 @@ public class UpdateRecord {
         
         RandomAccessFile tableFile = new RandomAccessFile(absoluteFilePath, "rw");
         if(tableFile.length() < DavisBase.PAGESIZE) //no meta data information found
-            throw new InvalidTableInformationException(tableName);
+            throw new InvalidTableInformationException("davisbase_tables");
         else;
         
         int curPage=1;
@@ -124,7 +124,7 @@ public class UpdateRecord {
     }
     public static void setRootPage(String tableName) throws IOException, IOException, InvalidTableInformationException, MissingTableFileException{
        String workingDirectory = System.getProperty("user.dir"); // gets current working directory
-        String absoluteFilePath = workingDirectory + File.separator + "data" + File.separator + "user_data" + File.separator + "davisbase_tables.tbl";
+        String absoluteFilePath = workingDirectory + File.separator + "data" + File.separator + "catalog" + File.separator + "davisbase_tables.tbl";
         File file = new File(absoluteFilePath);
         if (!(file.exists() && !file.isDirectory())){
             throw new MissingTableFileException("davisbase_tables");
@@ -132,7 +132,7 @@ public class UpdateRecord {
         
         RandomAccessFile tableFile = new RandomAccessFile(absoluteFilePath, "rw");
         if(tableFile.length() < DavisBase.PAGESIZE) //no meta data information found
-            throw new InvalidTableInformationException(tableName);
+            throw new InvalidTableInformationException("davisbase_tables");
         else;
         
         int curPage=1;

@@ -20,6 +20,7 @@ import io.github.sandeepsukumaran.davisbase.query.queryParser;
 import io.github.sandeepsukumaran.davisbase.exception.NoDatabaseSelectedException;
 import io.github.sandeepsukumaran.davisbase.exception.NoSuchColumnException;
 import io.github.sandeepsukumaran.davisbase.exception.NoSuchTableException;
+import io.github.sandeepsukumaran.davisbase.helpermethods.HelperMethods;
 import io.github.sandeepsukumaran.davisbase.tableinformation.TableColumnInfo;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -71,7 +72,8 @@ public class DavisBase {
                 Files.createFile(Paths.get(dataFolderPath.toString()+FileSystems.getDefault().getSeparator()+"catalog"+FileSystems.getDefault().getSeparator()+"davisbase_tables.tbl"));
                 Files.createFile(Paths.get(dataFolderPath.toString()+FileSystems.getDefault().getSeparator()+"catalog"+FileSystems.getDefault().getSeparator()+"davisbase_columns.tbl"));
                 Files.createDirectory(Paths.get(dataFolderPath.toString()+FileSystems.getDefault().getSeparator()+"user_data"));
-            }catch(IOException e){
+                HelperMethods.writeInitialMetaDataFiles();
+            }catch(Exception e){
                 System.out.println("ERROR : Unable to setup file structures. Terminating...");
                 return -1;
             }

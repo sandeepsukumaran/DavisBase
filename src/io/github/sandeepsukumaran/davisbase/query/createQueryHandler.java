@@ -166,7 +166,7 @@ public class createQueryHandler {
         tableFile.writeInt(-1);//no sibling
         tableFile.close();
         
-        
+        UpdateRecord.incrementRecordCount("davisbase_tables");
         DavisBase.populateTableNames();
     }
     
@@ -256,7 +256,8 @@ public class createQueryHandler {
             byte[] record = insertQueryHandler.buildRecord(insertionData, tci, tci.colNullable);
             
             if(curPage==1)
-                HelperMethods.writeRecordToFirstPage(file, record, highestrow_id+1+i);
+                if(HelperMethods.writeRecordToFirstPage(file, record, highestrow_id+1+i))
+                    UpdateRecord.setRootPage("davisbase_columns");
             else
                 HelperMethods.writeRecordToPage(file, record, curPage, highestrow_id+1+i);
             
@@ -275,14 +276,14 @@ public class createQueryHandler {
     private final String ATTR_LINE = "^(?<attrname>\\p{Alpha}\\w*)\\p{javaWhitespace}+(?<datatype>\\p{Alpha}+)\\p{javaWhitespace}*(?<constraints>\\p{javaWhitespace}+((primary\\p{javaWhitespace}+key)|(not\\p{javaWhitespace}+null)))?\\p{javaWhitespace}*,?$";
     private final String CREATE_QUERY = "^create\\p{javaWhitespace}+table\\p{javaWhitespace}+(?<tablename>\\p{Alpha}\\w*)\\p{javaWhitespace}+\\((?<attrlist>(\\p{Alpha}\\w*\\p{javaWhitespace}+\\p{Alpha}+\\p{javaWhitespace}*(\\p{javaWhitespace}+((primary\\p{javaWhitespace}+key)|(not\\p{javaWhitespace}+null)))?\\p{javaWhitespace}*,)*(\\p{Alpha}\\w*\\p{javaWhitespace}+\\p{Alpha}+\\p{javaWhitespace}*(\\p{javaWhitespace}+((primary\\p{javaWhitespace}+key)|(not\\p{javaWhitespace}+null)))?\\p{javaWhitespace}*))\\);$";
     
-    private static final Boolean[] TABLEMETADATACOLNULLABLE;
-    private static final DataType[] TABLEMETADATACOLDATATYPES;
-    private static final int TABLEMETADATANUMCOLS;
-    private static final String[] TABLEMETADATACOLNAMES;
+    public static final Boolean[] TABLEMETADATACOLNULLABLE;
+    public static final DataType[] TABLEMETADATACOLDATATYPES;
+    public static final int TABLEMETADATANUMCOLS;
+    public static final String[] TABLEMETADATACOLNAMES;
     
-    private static final Boolean[] TABLECOLMETADATACOLNULLABLE;
-    private static final DataType[] TABLECOLMETADATACOLDATATYPES;
-    private static final int TABLECOLMETADATANUMCOLS;
-    private static final String[] TABLECOLMETADATACOLNAMES;
+    public static final Boolean[] TABLECOLMETADATACOLNULLABLE;
+    public static final DataType[] TABLECOLMETADATACOLDATATYPES;
+    public static final int TABLECOLMETADATANUMCOLS;
+    public static final String[] TABLECOLMETADATACOLNAMES;
 }
 //each statement will have attr_name data_type (two words)? [PRIMARY KEY|NOT NULL]
