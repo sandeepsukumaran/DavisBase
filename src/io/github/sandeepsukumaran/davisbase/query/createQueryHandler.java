@@ -25,6 +25,7 @@ import io.github.sandeepsukumaran.davisbase.exception.TableAlreadyExistsExceptio
 import io.github.sandeepsukumaran.davisbase.helpermethods.HelperMethods;
 import io.github.sandeepsukumaran.davisbase.main.DavisBase;
 import io.github.sandeepsukumaran.davisbase.tableinformation.TableColumnInfo;
+import io.github.sandeepsukumaran.davisbase.tree.UpdateRecord;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -203,7 +204,8 @@ public class createQueryHandler {
         byte[] record = insertQueryHandler.buildRecord(insertionData, tci, tci.colNullable);
         
         if(curPage==1)
-            HelperMethods.writeRecordToFirstPage(file, record, highestrow_id+1);
+            if(HelperMethods.writeRecordToFirstPage(file, record, highestrow_id+1))
+                UpdateRecord.setRootPage("davisbase_tables");
         else
             HelperMethods.writeRecordToPage(file, record, curPage, highestrow_id+1);
     }

@@ -57,18 +57,20 @@ public class InsertRecord {
 
         int numPages = (int)(tableFile.length()/DavisBase.PAGESIZE);
         if(numPages==1)
-            writeRecordToFirstPage(tableFile,record,row_id,tableName);
+            if(writeRecordToFirstPage(tableFile,record,row_id,tableName))
+                UpdateRecord.setRootPage(tableName);
         else
             writeRecordToPage(tableFile,record,numPages,row_id,tableName);
 
         tableFile.close();
     }
     
-    private static void writeRecordToFirstPage(RandomAccessFile tableFile, byte[] record,int row_id,String tableName) throws IOException, MissingTableFileException, FileNotFoundException, InvalidTableInformationException{
+    private static boolean writeRecordToFirstPage(RandomAccessFile tableFile, byte[] record,int row_id,String tableName) throws IOException, MissingTableFileException, FileNotFoundException, InvalidTableInformationException{
         tableFile.skipBytes(1);//skip over page type - will be0x0d
         short numCols = tableFile.readByte();
         short cellStart = tableFile.readShort();
         int headerEnd = 8+2*numCols;
+        boolean returnval;
         if(record.length+2 <= cellStart-headerEnd){
             //will fit in current page
             tableFile.seek(cellStart-record.length);
@@ -81,6 +83,7 @@ public class InsertRecord {
             tableFile.skipBytes(4+2*numCols);
             //update cell pointers list - simple since row_id will always be monotonically increasing
             tableFile.writeShort(cellStart-record.length);
+            returnval = false;
         }else{
             //will not fit in current page
             //add two more pages
@@ -107,8 +110,10 @@ public class InsertRecord {
             tableFile.seek(3*DavisBase.PAGESIZE - 8);
             tableFile.writeInt(1);
             tableFile.writeInt(row_id);
+            returnval = true;
         }
         UpdateRecord.incrementRecordCount(tableName);
+        return returnval;
     }
     
     private static void writeRecordToPage(RandomAccessFile tableFile, byte[] record, int pageNum,int row_id,String tableName) throws IOException, MissingTableFileException, FileNotFoundException, InvalidTableInformationException{

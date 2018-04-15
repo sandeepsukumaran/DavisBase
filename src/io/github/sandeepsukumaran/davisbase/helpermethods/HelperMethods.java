@@ -45,7 +45,7 @@ public class HelperMethods {
         return result;
     }
     
-    public static void writeRecordToFirstPage(RandomAccessFile tableFile, byte[] record,int row_id) throws IOException, MissingTableFileException, FileNotFoundException, InvalidTableInformationException{
+    public static boolean writeRecordToFirstPage(RandomAccessFile tableFile, byte[] record,int row_id) throws IOException, MissingTableFileException, FileNotFoundException, InvalidTableInformationException{
         tableFile.skipBytes(1);//skip over page type - will be0x0d
         short numCols = tableFile.readByte();
         short cellStart = tableFile.readShort();
@@ -62,6 +62,7 @@ public class HelperMethods {
             tableFile.skipBytes(4+2*numCols);
             //update cell pointers list - simple since row_id will always be monotonically increasing
             tableFile.writeShort(cellStart-record.length);
+            return false;
         }else{
             //will not fit in current page
             //add two more pages
@@ -88,6 +89,7 @@ public class HelperMethods {
             tableFile.seek(3*DavisBase.PAGESIZE - 8);
             tableFile.writeInt(1);
             tableFile.writeInt(row_id);
+            return true;
         }
     }
     
