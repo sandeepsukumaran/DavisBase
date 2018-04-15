@@ -20,12 +20,15 @@ import io.github.sandeepsukumaran.davisbase.display.Display;
 import io.github.sandeepsukumaran.davisbase.exception.FileAccessException;
 import io.github.sandeepsukumaran.davisbase.exception.InvalidDataType;
 import io.github.sandeepsukumaran.davisbase.exception.InvalidQuerySyntaxException;
+import io.github.sandeepsukumaran.davisbase.exception.InvalidTableInformationException;
 import io.github.sandeepsukumaran.davisbase.exception.MissingTableFileException;
 import io.github.sandeepsukumaran.davisbase.exception.NoSuchColumnException;
 import io.github.sandeepsukumaran.davisbase.exception.NoSuchTableException;
 import io.github.sandeepsukumaran.davisbase.main.DavisBase;
 import io.github.sandeepsukumaran.davisbase.result.ResultSet;
 import io.github.sandeepsukumaran.davisbase.tree.ReadRows;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.regex.Matcher;
@@ -52,8 +55,11 @@ public class selectQueryHandler {
      * @throws io.github.sandeepsukumaran.davisbase.exception.FileAccessException
      * @throws io.github.sandeepsukumaran.davisbase.exception.MissingTableFileException
      * @throws io.github.sandeepsukumaran.davisbase.exception.InvalidDataType
+     * @throws java.io.IOException
+     * @throws java.io.FileNotFoundException
+     * @throws io.github.sandeepsukumaran.davisbase.exception.InvalidTableInformationException
      */
-    public void execute() throws NoSuchTableException,NoSuchColumnException,InvalidQuerySyntaxException, FileAccessException, MissingTableFileException, InvalidDataType{
+    public void execute() throws NoSuchTableException,NoSuchColumnException,InvalidQuerySyntaxException, FileAccessException, MissingTableFileException, InvalidDataType, IOException, FileNotFoundException, InvalidTableInformationException{
         if (selectAllMatcher.matches()){
             //select all query
             selectAllQueryExecute();
@@ -65,7 +71,7 @@ public class selectQueryHandler {
             throw new InvalidQuerySyntaxException();
     }
     
-    private void selectAllQueryExecute() throws NoSuchTableException, NoSuchColumnException, FileAccessException, MissingTableFileException, InvalidDataType{
+    private void selectAllQueryExecute() throws NoSuchTableException, NoSuchColumnException, FileAccessException, MissingTableFileException, InvalidDataType, IOException, FileNotFoundException, InvalidTableInformationException{
         ArrayList<String> tableNames = DavisBase.getTableNames();
         String tableName = selectAllMatcher.group("tablename");
         if (!tableNames.contains(tableName))
@@ -103,7 +109,7 @@ public class selectQueryHandler {
         }
     }
     
-    private void selectQueryExecute() throws NoSuchTableException, NoSuchColumnException, FileAccessException, MissingTableFileException, InvalidDataType{
+    private void selectQueryExecute() throws NoSuchTableException, NoSuchColumnException, FileAccessException, MissingTableFileException, InvalidDataType, IOException, FileNotFoundException, InvalidTableInformationException{
         ArrayList<String> tableNames = DavisBase.getTableNames();
         String tableName = selectMatcher.group("tablename");
         if (!tableNames.contains(tableName))

@@ -5,6 +5,7 @@
  */
 package io.github.sandeepsukumaran.davisbase.main;
 
+import io.github.sandeepsukumaran.davisbase.datatype.DataType;
 import io.github.sandeepsukumaran.davisbase.exception.ArgumentCountMismatchException;
 import io.github.sandeepsukumaran.davisbase.exception.BadInputValueException;
 import io.github.sandeepsukumaran.davisbase.exception.ColumnCannotBeNullException;
@@ -20,7 +21,10 @@ import io.github.sandeepsukumaran.davisbase.exception.NoDatabaseSelectedExceptio
 import io.github.sandeepsukumaran.davisbase.exception.NoSuchColumnException;
 import io.github.sandeepsukumaran.davisbase.exception.NoSuchTableException;
 import io.github.sandeepsukumaran.davisbase.tableinformation.TableColumnInfo;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.FileSystems;
@@ -107,10 +111,55 @@ public class DavisBase {
     
     /**
      * Read table names from davisbase_tables.tbl file and populate list of table names.
+     * @throws io.github.sandeepsukumaran.davisbase.exception.InvalidTableInformationException
+     * @throws java.io.IOException
+     * @throws io.github.sandeepsukumaran.davisbase.exception.MissingTableFileException
      */
-    public static void populateTableNames(){
+    public static void populateTableNames() throws InvalidTableInformationException, IOException, MissingTableFileException{
         //read from davisbase_tables.tbl and get the list of table names
         tableNames = new ArrayList<>();
+        String workingDirectory = System.getProperty("user.dir"); // gets current working directory
+	String absoluteFilePath = workingDirectory + File.separator + "data" + File.separator + "catalog" + File.separator + "davisbase_tables.tbl";
+	File file = new File(absoluteFilePath);
+        if (!(file.exists() && !file.isDirectory())){
+            System.out.println("Table Metadata Information has been deleted. Cannot guarantee proper execution.");
+            throw new MissingTableFileException("davisbase_tables");
+        }else;
+        
+        RandomAccessFile catalogTableFile = new RandomAccessFile(absoluteFilePath, "rw");
+	if(catalogTableFile.length() < DavisBase.PAGESIZE) //no meta data information found
+            throw new InvalidTableInformationException("davisbase_tables");
+        else;
+        
+        int curPage = 1;
+        while(curPage != -1){
+            long pageStart = (curPage-1)*DavisBase.PAGESIZE;
+            catalogTableFile.seek(pageStart);
+            catalogTableFile.skipBytes(1); //unused- will be page type
+            int numRecordsInPage = catalogTableFile.readByte();
+            catalogTableFile.skipBytes(2);//unused will be start of cell area
+            int nextPage = catalogTableFile.readInt();
+            ArrayList<Short> cellLocations = new ArrayList<>();
+            for(int i=0;i<numRecordsInPage;++i)
+                cellLocations.add(catalogTableFile.readShort());
+            
+            for(Short cellLocation:cellLocations){
+                catalogTableFile.seek(pageStart+cellLocation);
+                
+                catalogTableFile.skipBytes(7);//skip over header and number of columns - will be 3 (name, record_count,root_page)
+                int tableNameLen = catalogTableFile.readByte()-12;//read value - 0x0c
+                //table names will always be non null
+                catalogTableFile.skipBytes(2);//skip over serial codes for record_count and root_page
+                
+                //read name of table
+                byte[] tabNameByteBuffer = new byte[tableNameLen];
+                catalogTableFile.read(tabNameByteBuffer);
+                String tabName = new String(tabNameByteBuffer);
+                tableNames.add(tabName);
+            }
+            
+            curPage = nextPage;
+        }
     }
     
     /**
@@ -125,13 +174,97 @@ public class DavisBase {
      * Returns names of columns in given table by reading davisbase_columns.tbl file
      * @param tableName Name of table
      * @return ArrayList of String containing names of columns in table in ordinal order.
+     * @throws io.github.sandeepsukumaran.davisbase.exception.MissingTableFileException
+     * @throws java.io.FileNotFoundException
+     * @throws io.github.sandeepsukumaran.davisbase.exception.InvalidTableInformationException
      */
-    public static ArrayList<String> getTableColumns(String tableName){
+    public static ArrayList<String> getTableColumns(String tableName) throws MissingTableFileException, FileNotFoundException, IOException, InvalidTableInformationException{
         return getTableInfo(tableName).colNames;
     }
 
-    public static TableColumnInfo getTableInfo(String tableName){
-        TableColumnInfo tci = null;
+    /**
+     * Returns schema of given table by reading davisbase_columns.tbl file
+     * @param tableName Name of table
+     * @return TableColumnInfo object describing schema of table
+     * @throws MissingTableFileException
+     * @throws java.io.FileNotFoundException
+     * @throws io.github.sandeepsukumaran.davisbase.exception.InvalidTableInformationException
+     */
+    public static TableColumnInfo getTableInfo(String tableName) throws MissingTableFileException, FileNotFoundException, IOException, InvalidTableInformationException{
+        TableColumnInfo tci = new TableColumnInfo();
+        int numCols = 0;
+        ArrayList<String> colNames = new ArrayList<>();
+        ArrayList<DataType> colDataTypes = new ArrayList<>();
+        ArrayList<Boolean> nullable = new ArrayList<>();
+        
+        String workingDirectory = System.getProperty("user.dir"); // gets current working directory
+	String absoluteFilePath = workingDirectory + File.separator + "data" + File.separator + "catalog" + File.separator + "davisbase_columns.tbl";
+	File file = new File(absoluteFilePath);
+        if (!(file.exists() && !file.isDirectory())){
+            System.out.println("Table Metadata Information has been deleted. Cannot guarantee proper execution.");
+            throw new MissingTableFileException("davisbase_columns");
+        }else;
+        
+        RandomAccessFile catalogTableFile = new RandomAccessFile(absoluteFilePath, "rw");
+	if(catalogTableFile.length() < DavisBase.PAGESIZE) //no meta data information found
+            throw new InvalidTableInformationException("davisbase_columns");
+        else;
+        
+        int curPage = 1;
+        while(curPage != -1){
+            long pageStart = (curPage-1)*DavisBase.PAGESIZE;
+            catalogTableFile.seek(pageStart);
+            catalogTableFile.skipBytes(1); //unused- will be page type
+            int numRecordsInPage = catalogTableFile.readByte();
+            catalogTableFile.skipBytes(2);//unused will be start of cell area
+            int nextPage = catalogTableFile.readInt();
+            ArrayList<Short> cellLocations = new ArrayList<>();
+            for(int i=0;i<numRecordsInPage;++i)
+                cellLocations.add(catalogTableFile.readShort());
+            
+            for(Short cellLocation:cellLocations){
+                catalogTableFile.seek(pageStart+cellLocation);
+                
+                catalogTableFile.skipBytes(7);//skip over header and number of columns - will be 5 (table_name, column_name, data_type, ordinal_position, is_nullable)
+                int tableNameLen = catalogTableFile.readByte()-12;//read value - 0x0c
+                //table names will always be non null
+                int colNameLen = catalogTableFile.readByte()-12;//read value - 0x0c
+                //column names will always be non null
+                int dataTypeLen = catalogTableFile.readByte()-12;//read value - 0x0c
+                catalogTableFile.skipBytes(1);//skip over size of ordinal_position
+                int nullabilityLen = catalogTableFile.readByte()-12;//read value - 0x0c
+                
+                //read name of table
+                byte[] tabNameByteBuffer = new byte[tableNameLen];
+                catalogTableFile.read(tabNameByteBuffer);
+                String tabName = new String(tabNameByteBuffer);
+                if(!tabName.equalsIgnoreCase(tableName))
+                    continue;// this is not the table you are looking for
+                else
+                    ++numCols;
+                byte[] colNameByteBuffer = new byte[colNameLen];
+                catalogTableFile.read(colNameByteBuffer);
+                String colName = new String(colNameByteBuffer);
+                colNames.add(colName);
+                byte[] dataTypeByteBuffer = new byte[dataTypeLen];
+                catalogTableFile.read(dataTypeByteBuffer);
+                String dataTypeName = new String(dataTypeByteBuffer);
+                colDataTypes.add(new DataType(dataTypeName));
+                //ordinal position is ignored - assumed to always be increasing
+                catalogTableFile.skipBytes(1);
+                if(nullabilityLen==2)//NO
+                    nullable.add(false);
+                else
+                    nullable.add(true);
+            }
+            
+            curPage = nextPage;
+        }
+        
+        tci.numCols = numCols;
+        tci.colDataTypes = colDataTypes;
+        tci.colNames = colNames;
+        tci.colNullable = nullable;
         return tci;
     }
     

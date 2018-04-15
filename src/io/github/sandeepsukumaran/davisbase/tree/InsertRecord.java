@@ -64,7 +64,7 @@ public class InsertRecord {
             tableFile.close();
     }
     
-    private static void writeRecordToFirstPage(RandomAccessFile tableFile, byte[] record,int row_id,String tableName) throws IOException{
+    private static void writeRecordToFirstPage(RandomAccessFile tableFile, byte[] record,int row_id,String tableName) throws IOException, MissingTableFileException, FileNotFoundException, InvalidTableInformationException{
         tableFile.skipBytes(1);//skip over page type - will be0x0d
         short numCols = tableFile.readByte();
         short cellStart = tableFile.readShort();
@@ -111,7 +111,7 @@ public class InsertRecord {
         UpdateRecord.incrementRecordCount(tableName);
     }
     
-    private static void writeRecordToPage(RandomAccessFile tableFile, byte[] record, int pageNum,int row_id,String tableName) throws IOException{
+    private static void writeRecordToPage(RandomAccessFile tableFile, byte[] record, int pageNum,int row_id,String tableName) throws IOException, MissingTableFileException, FileNotFoundException, InvalidTableInformationException{
         if(pageNum==3)
             pageNum=2;
         else;

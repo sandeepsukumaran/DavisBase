@@ -61,8 +61,9 @@ public class insertQueryHandler {
      * @throws java.io.IOException
      * @throws io.github.sandeepsukumaran.davisbase.exception.NoSuchColumnException
      * @throws io.github.sandeepsukumaran.davisbase.exception.ColumnCannotBeNullException
+     * @throws io.github.sandeepsukumaran.davisbase.exception.MissingTableFileException
      */
-    public void execute() throws InvalidQuerySyntaxException, NoSuchTableException, ArgumentCountMismatchException, BadInputValueException, InvalidTableInformationException, IOException, NoSuchColumnException, ColumnCannotBeNullException{
+    public void execute() throws InvalidQuerySyntaxException, NoSuchTableException, ArgumentCountMismatchException, BadInputValueException, InvalidTableInformationException, IOException, NoSuchColumnException, ColumnCannotBeNullException, MissingTableFileException{
         if (insertAllMatcher.matches()){
             //select all query
             insertAllQueryExecute();
@@ -74,7 +75,7 @@ public class insertQueryHandler {
             throw new InvalidQuerySyntaxException();
     }
     
-    private void insertAllQueryExecute() throws NoSuchTableException, ArgumentCountMismatchException, BadInputValueException, InvalidTableInformationException, IOException{
+    private void insertAllQueryExecute() throws NoSuchTableException, ArgumentCountMismatchException, BadInputValueException, InvalidTableInformationException, IOException, MissingTableFileException{
         ArrayList<String> tableNames = DavisBase.getTableNames();
         String tableName = insertAllMatcher.group("tablename");
         if (!tableNames.contains(tableName))
@@ -144,7 +145,7 @@ public class insertQueryHandler {
         return colData;
     }
     
-    private void insertQueryExecute() throws NoSuchTableException, ArgumentCountMismatchException, BadInputValueException, InvalidTableInformationException, IOException, NoSuchColumnException, ColumnCannotBeNullException{
+    private void insertQueryExecute() throws NoSuchTableException, ArgumentCountMismatchException, BadInputValueException, InvalidTableInformationException, IOException, NoSuchColumnException, ColumnCannotBeNullException, MissingTableFileException{
         ArrayList<String> tableNames = DavisBase.getTableNames();
         String tableName = insertMatcher.group("tablename");
         if (!tableNames.contains(tableName))

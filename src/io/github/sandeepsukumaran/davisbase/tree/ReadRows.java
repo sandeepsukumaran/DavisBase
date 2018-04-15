@@ -69,7 +69,7 @@ public class ReadRows {
             
             int curPage = 1;
             while (curPage != -1){
-                long pageStart = curPage*DavisBase.PAGESIZE;
+                long pageStart = (curPage-1)*DavisBase.PAGESIZE;
                 tableFile.seek(pageStart);
                 tableFile.skipBytes(1); //unused- will be page type
                 int numRecordsInPage = tableFile.readByte();
@@ -250,7 +250,7 @@ public class ReadRows {
             
             int curPage = 1;
             while (curPage != -1){
-                long pageStart = curPage*DavisBase.PAGESIZE;
+                long pageStart = (curPage-1)*DavisBase.PAGESIZE;
                 tableFile.seek(pageStart);
                 tableFile.skipBytes(1); //unused- will be page type
                 int numRecordsInPage = tableFile.readByte();
@@ -441,7 +441,7 @@ public class ReadRows {
             
             int curPage = 1;
             while (curPage != -1){
-                long pageStart = curPage*DavisBase.PAGESIZE;
+                long pageStart = (curPage-1)*DavisBase.PAGESIZE;
                 tableFile.seek(pageStart);
                 tableFile.skipBytes(1); //unused- will be page type
                 int numRecordsInPage = tableFile.readByte();
@@ -597,7 +597,7 @@ public class ReadRows {
         
         int curPage = 1;
         while(curPage != -1){
-            long pageStart = curPage*DavisBase.PAGESIZE;
+            long pageStart = (curPage-1)*DavisBase.PAGESIZE;
             catalogTableFile.seek(pageStart);
             catalogTableFile.skipBytes(1); //unused- will be page type
             int numRecordsInPage = catalogTableFile.readByte();
@@ -663,7 +663,7 @@ public class ReadRows {
         */
         int curPage = 1;
         while(curPage != -1){
-            long pageStart = curPage*DavisBase.PAGESIZE;
+            long pageStart = (curPage-1)*DavisBase.PAGESIZE;
             catalogTableColumnFile.seek(pageStart);
             catalogTableColumnFile.skipBytes(1); //unused- will be page type
             int numRecordsInPage = catalogTableColumnFile.readByte();
