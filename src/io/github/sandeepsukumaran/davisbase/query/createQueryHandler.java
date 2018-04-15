@@ -165,6 +165,9 @@ public class createQueryHandler {
         tableFile.writeByte((byte)DavisBase.PAGESIZE);//start of cell area is at the very end of file
         tableFile.writeInt(-1);//no sibling
         tableFile.close();
+        
+        
+        DavisBase.populateTableNames();
     }
     
     private void updateTablesMetadataFile(String tableName, RandomAccessFile file) throws IOException, InvalidTableInformationException, MissingTableFileException{
