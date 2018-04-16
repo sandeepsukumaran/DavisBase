@@ -253,7 +253,7 @@ public class insertQueryHandler {
             recordData.add(b);
         
         //payload
-        recordData.add((byte)tci.numCols);
+        recordData.add((byte)(tci.numCols-1));
         //write serial type codes
         for(int i=1;i<tci.numCols;++i)
             switch(tci.colDataTypes.get(i).getDataTypeAsInt()){
@@ -320,13 +320,13 @@ public class insertQueryHandler {
                     if(isnull.get(i))
                         recordData.add((byte)0x00);
                     else
-                        recordData.add((Byte)colData.get(i));
+                        recordData.add((byte)colData.get(i));
                     break;
                 case 2:
                     if(isnull.get(i)){
                         recordData.add((byte)0x00);recordData.add((byte)0x00);
                     }else{
-                        short sdata = (Short)colData.get(i);
+                        short sdata = (short)colData.get(i);
                         ByteBuffer shortbuffer = ByteBuffer.allocate(2);
                         shortbuffer.putShort(sdata);
                         for(Byte b:shortbuffer.array())
@@ -338,7 +338,7 @@ public class insertQueryHandler {
                         recordData.add((byte)0x00);recordData.add((byte)0x00);
                         recordData.add((byte)0x00);recordData.add((byte)0x00);
                     }else{
-                        int idata = (Integer)colData.get(i);
+                        int idata = (int)colData.get(i);
                         intbuffer = ByteBuffer.allocate(4);
                         intbuffer.putInt(idata);
                         for(Byte b:intbuffer.array())
@@ -354,7 +354,7 @@ public class insertQueryHandler {
                         recordData.add((byte)0x00);recordData.add((byte)0x00);
                         recordData.add((byte)0x00);recordData.add((byte)0x00);
                     }else{
-                        long ldata = (Long)colData.get(i);
+                        long ldata = (long)colData.get(i);
                         ByteBuffer longbuffer = ByteBuffer.allocate(8);
                         longbuffer.putLong(ldata);
                         for(Byte b:longbuffer.array())
@@ -366,7 +366,7 @@ public class insertQueryHandler {
                         recordData.add((byte)0x00);recordData.add((byte)0x00);
                         recordData.add((byte)0x00);recordData.add((byte)0x00);
                     }else{
-                        float fdata = (Float)colData.get(i);
+                        float fdata = (float)colData.get(i);
                         ByteBuffer floatbuffer = ByteBuffer.allocate(4);
                         floatbuffer.putFloat(fdata);
                         for(Byte b:floatbuffer.array())
@@ -380,7 +380,7 @@ public class insertQueryHandler {
                         recordData.add((byte)0x00);recordData.add((byte)0x00);
                         recordData.add((byte)0x00);recordData.add((byte)0x00);
                     }else{
-                        double ddata = (Double)colData.get(i);
+                        double ddata = (double)colData.get(i);
                         ByteBuffer doublebuffer = ByteBuffer.allocate(8);
                         doublebuffer.putDouble(ddata);
                         for(Byte b:doublebuffer.array())
@@ -413,8 +413,8 @@ public class insertQueryHandler {
     private final Matcher insertAllMatcher;
     private final Matcher insertMatcher;
     private final String query;
-    private final String INSERT_ALL_QUERY = "^insert into (?<tablename>\\w+)\\p{javaWhitespace}*values\\p{javaWhitespace}*(?<values>\\((\\d+(\\.\\d+)?)|(\"(\\p{Punct}&&[^\"\'])+\")(\\p{javaWhitespace}*,\\p{javaWhitespace}*(\\d+(\\.\\d+)?)|\"(\\p{Punct}&&[^\"\'])+\")*\\));$";
-    private final String INSERT_QUERY = "^insert into (?<tablename>\\w+)\\p{javaWhitespace}*(?<colnames>\\(\\w+(\\p{javaWhitespace}*,\\p{javaWhitespace}*\\w+)*\\))\\p{javaWhitespace}*values\\p{javaWhitespace}*(?<values>\\((\\d+(\\.\\d+)?)|(\"(\\p{Punct}&&[^\"\'])+\")(\\p{javaWhitespace}*,\\p{javaWhitespace}*(\\d+(\\.\\d+)?)|\"(\\p{Punct}&&[^\"\'])+\")*\\));$";
+    private final String INSERT_ALL_QUERY = "^insert into (?<tablename>\\w+)\\p{javaWhitespace}*values\\p{javaWhitespace}*(?<values>\\(((\\d+(\\.\\d+)?)|(\"(\\p{Punct}&&[^\"\'])+\"))(\\p{javaWhitespace}*,\\p{javaWhitespace}*((\\d+(\\.\\d+)?)|\"(\\p{Punct}&&[^\"\'])+\"))*\\));$";
+    private final String INSERT_QUERY = "^insert into (?<tablename>\\w+)\\p{javaWhitespace}*(?<colnames>\\(\\w+(\\p{javaWhitespace}*,\\p{javaWhitespace}*\\w+)*\\))\\p{javaWhitespace}*values\\p{javaWhitespace}*(?<values>\\(((\\d+(\\.\\d+)?)|(\"(\\p{Punct}&&[^\"\'])+\"))(\\p{javaWhitespace}*,\\p{javaWhitespace}*((\\d+(\\.\\d+)?)|\"(\\p{Punct}&&[^\"\'])+\"))*\\));$";
 }
 
 class ParseResult{

@@ -60,8 +60,9 @@ public class DavisBase {
                 return -1;
             }else if(!Files.isWritable(dataFolderPath)){
                 System.out.println("WARNING: User does not have write permission in this location. Read only mode.");
+                return -1;
+            }else
                 return 0;
-            }
         }else if(!Files.isWritable(Paths.get(workingDirectory))){
             System.out.println("ERROR : Unable to setup file structures. Terminating...");
             return -1;
@@ -73,8 +74,10 @@ public class DavisBase {
                 Files.createFile(Paths.get(dataFolderPath.toString()+FileSystems.getDefault().getSeparator()+"catalog"+FileSystems.getDefault().getSeparator()+"davisbase_columns.tbl"));
                 Files.createDirectory(Paths.get(dataFolderPath.toString()+FileSystems.getDefault().getSeparator()+"user_data"));
                 HelperMethods.writeInitialMetaDataFiles();
-            }catch(Exception e){
+            }catch(InvalidTableInformationException | MissingTableFileException | IOException e){
                 System.out.println("ERROR : Unable to setup file structures. Terminating...");
+                System.out.println(e);
+                e.printStackTrace();
                 return -1;
             }
         }
@@ -105,6 +108,7 @@ public class DavisBase {
                 System.out.println("\nERROR 1046 : No database selected.");
             }catch(InvalidQuerySyntaxException|NoSuchTableException|NoSuchColumnException|FileAccessException|MissingTableFileException|InvalidDataType|ArgumentCountMismatchException | BadInputValueException | InvalidTableInformationException | IOException | ColumnCannotBeNullException e){
                 System.out.println(e);
+                e.printStackTrace();
             }
         }
         

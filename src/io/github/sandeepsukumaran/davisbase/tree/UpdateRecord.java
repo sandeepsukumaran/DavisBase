@@ -47,7 +47,7 @@ public class UpdateRecord {
         
         int curPage=1;
         while(curPage!=-1){
-            long pageStart = curPage*DavisBase.PAGESIZE;
+            long pageStart = (curPage-1)*DavisBase.PAGESIZE;
             tableFile.seek(pageStart);
             tableFile.skipBytes(1); //unused- will be page type
             int numRecordsInPage = tableFile.readByte();
@@ -92,7 +92,7 @@ public class UpdateRecord {
         
         int curPage=1;
         while(curPage!=-1){
-            long pageStart = curPage*DavisBase.PAGESIZE;
+            long pageStart = (curPage-1)*DavisBase.PAGESIZE;
             tableFile.seek(pageStart);
             tableFile.skipBytes(1); //unused- will be page type
             int numRecordsInPage = tableFile.readByte();
@@ -137,7 +137,7 @@ public class UpdateRecord {
         
         int curPage=1;
         while(curPage!=-1){
-            long pageStart = curPage*DavisBase.PAGESIZE;
+            long pageStart = (curPage-1)*DavisBase.PAGESIZE;
             tableFile.seek(pageStart);
             tableFile.skipBytes(1); //unused- will be page type
             int numRecordsInPage = tableFile.readByte();

@@ -193,7 +193,7 @@ public class HelperMethods {
         insertionData.add((Integer)(1));
         insertionData.add("davisbase_tables");
         insertionData.add((Integer)(2));
-        insertionData.add((Integer)(1));
+        insertionData.add((Short)((short)1));
         
         TableColumnInfo tci = new TableColumnInfo();
         tci.numCols = createQueryHandler.TABLEMETADATANUMCOLS;
@@ -213,7 +213,7 @@ public class HelperMethods {
         insertionData.add((Integer)(2));
         insertionData.add("davisbase_columns");
         insertionData.add((Integer)(10));
-        insertionData.add((Integer)(1));
+        insertionData.add((Short)((short)1));
         
         record = insertQueryHandler.buildRecord(insertionData, tci, tci.colNullable);
         catalogTableFile.seek(pos - record.length);
@@ -248,10 +248,10 @@ public class HelperMethods {
         
         //---------------------------------------------------------------------------------
         TableColumnInfo tci = new TableColumnInfo();
-        tci.numCols = TABLECOLMETADATANUMCOLS;
-        tci.colNames = new ArrayList<>(Arrays.asList(TABLECOLMETADATACOLNAMES));
-        tci.colDataTypes = new ArrayList<>(Arrays.asList(TABLECOLMETADATACOLDATATYPES));
-        tci.colNullable = new ArrayList<>(Arrays.asList(TABLECOLMETADATACOLNULLABLE));
+        tci.numCols = createQueryHandler.TABLECOLMETADATANUMCOLS;
+        tci.colNames = new ArrayList<>(Arrays.asList(createQueryHandler.TABLECOLMETADATACOLNAMES));
+        tci.colDataTypes = new ArrayList<>(Arrays.asList(createQueryHandler.TABLECOLMETADATACOLDATATYPES));
+        tci.colNullable = new ArrayList<>(Arrays.asList(createQueryHandler.TABLECOLMETADATACOLNULLABLE));
         
         int highestrow_id=0; int curPage=1; int numPages;
         String tableName = "davisbase_tables";

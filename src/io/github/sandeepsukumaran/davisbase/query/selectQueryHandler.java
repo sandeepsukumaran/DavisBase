@@ -166,6 +166,6 @@ public class selectQueryHandler {
     private final Matcher selectAllMatcher;
     private final Matcher selectMatcher;
     private final String query;
-    private final String SELECT_ALL_QUERY = "^select \\* from (?<tablename>\\w+) (?<whereclause>where\\p{javaWhitespace}+\\w+(\\p{javaWhitespace}*(=|<=|<|>|>=|<>)\\p{javaWhitespace}*((\\d+(\\.\\d+)?)|\"(\\p{Punct}&&[^\"\'])+\"))|(\\p{javaWhitespace}+is null)|(\\p{javaWhitespace}+is not null))?;$";
-    private static final String SELECT_QUERY = "^select (?<columnnames>\\w+(\\p{javaWhitespace}?,\\p{javaWhitespace}?\\w+)*) from (<?tablename>\\w+) (?<whereclause>where\\p{javaWhitespace}+\\w+(\\p{javaWhitespace}*(=|<=|<|>|>=|<>)\\p{javaWhitespace}*((\\d+(\\.\\d+)?)|\"(\\p{Punct}&&[^\"\'])+\"))|(\\p{javaWhitespace}+is null)|(\\p{javaWhitespace}+is not null))?;$";
+    private final String SELECT_ALL_QUERY = "^select \\* from (?<tablename>\\w+)(?<whereclause>where\\p{javaWhitespace}+\\w+(\\p{javaWhitespace}*(=|<=|<|>|>=|<>)\\p{javaWhitespace}*((\\d+(\\.\\d+)?)|\"(\\p{Punct}&&[^\"\'])+\"))|(\\p{javaWhitespace}+is null)|(\\p{javaWhitespace}+is not null))?$";
+    private static final String SELECT_QUERY = "^select (?<columnnames>\\w+(\\p{javaWhitespace}?,\\p{javaWhitespace}?\\w+)*) from (<?tablename>\\w+)(?<whereclause>where\\p{javaWhitespace}+\\w+(\\p{javaWhitespace}*(=|<=|<|>|>=|<>)\\p{javaWhitespace}*((\\d+(\\.\\d+)?)|\"(\\p{Punct}&&[^\"\'])+\"))|(\\p{javaWhitespace}+is null)|(\\p{javaWhitespace}+is not null))?$";
 }
