@@ -413,8 +413,8 @@ public class insertQueryHandler {
     private final Matcher insertAllMatcher;
     private final Matcher insertMatcher;
     private final String query;
-    private final String INSERT_ALL_QUERY = "^insert into (?<tablename>\\w+)\\p{javaWhitespace}*values\\p{javaWhitespace}*(?<values>\\(((\\d+(\\.\\d+)?)|(\"(\\p{Punct}&&[^\"\'])+\"))(\\p{javaWhitespace}*,\\p{javaWhitespace}*((\\d+(\\.\\d+)?)|\"(\\p{Punct}&&[^\"\'])+\"))*\\));$";
-    private final String INSERT_QUERY = "^insert into (?<tablename>\\w+)\\p{javaWhitespace}*(?<colnames>\\(\\w+(\\p{javaWhitespace}*,\\p{javaWhitespace}*\\w+)*\\))\\p{javaWhitespace}*values\\p{javaWhitespace}*(?<values>\\(((\\d+(\\.\\d+)?)|(\"(\\p{Punct}&&[^\"\'])+\"))(\\p{javaWhitespace}*,\\p{javaWhitespace}*((\\d+(\\.\\d+)?)|\"(\\p{Punct}&&[^\"\'])+\"))*\\));$";
+    private final String INSERT_ALL_QUERY = "^insert into (?<tablename>\\w+)\\p{javaWhitespace}*values\\p{javaWhitespace}*(?<values>\\(((\\d+(\\.\\d+)?)|(\"([\\p{Graph}&&[^\"\']])+\"))(\\p{javaWhitespace}*,\\p{javaWhitespace}*((\\d+(\\.\\d+)?)|\"([\\p{Graph}&&[^\"\']])+\"))*\\));$";
+    private final String INSERT_QUERY = "^insert into (?<tablename>\\w+)\\p{javaWhitespace}*(?<colnames>\\(\\w+(\\p{javaWhitespace}*,\\p{javaWhitespace}*\\w+)*\\))\\p{javaWhitespace}*values\\p{javaWhitespace}*(?<values>\\(((\\d+(\\.\\d+)?)|(\"([\\p{Graph}&&[^\"\']])+\"))(\\p{javaWhitespace}*,\\p{javaWhitespace}*((\\d+(\\.\\d+)?)|\"([\\p{Graph}&&[^\"\']])+\"))*\\));$";
 }
 
 class ParseResult{

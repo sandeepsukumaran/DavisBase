@@ -74,6 +74,7 @@ public class DavisBase {
                 Files.createFile(Paths.get(dataFolderPath.toString()+FileSystems.getDefault().getSeparator()+"catalog"+FileSystems.getDefault().getSeparator()+"davisbase_columns.tbl"));
                 Files.createDirectory(Paths.get(dataFolderPath.toString()+FileSystems.getDefault().getSeparator()+"user_data"));
                 HelperMethods.writeInitialMetaDataFiles();
+                populateTableNames();
             }catch(InvalidTableInformationException | MissingTableFileException | IOException e){
                 System.out.println("ERROR : Unable to setup file structures. Terminating...");
                 System.out.println(e);

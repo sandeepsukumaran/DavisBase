@@ -67,7 +67,7 @@ public class queryParser {
         }
         //inputCommand is not one of the above cases
         if (inputCommand.matches(SELECT_QUERY))
-            System.out.println("Select query");//new selectQueryHandler(inputCommand).execute();
+            new selectQueryHandler(inputCommand).execute();
         else if (inputCommand.matches(INSERT_QUERY))
             System.out.println("Insert query");//new insertQueryHandler(inputCommand).execute();
         else if(inputCommand.matches(UPDATE_QUERY))
@@ -125,8 +125,8 @@ public class queryParser {
     //static final String SHOW_DATABASES_COMMAND = "show databases";
     
     //regex for valid commands
-    static final String SELECT_QUERY = "select ((\\*)|(\\w+(\\p{javaWhitespace}?,\\p{javaWhitespace}?\\w+)*)) from (\\w+)(where\\p{javaWhitespace}+\\w+(\\p{javaWhitespace}*(=|<=|<|>|>=|<>)\\p{javaWhitespace}*((\\d+(\\.\\d+)?)|\"(\\p{Punct}&&[^\"\'])+\"))|(\\p{javaWhitespace}+is null)|(\\p{javaWhitespace}+is not null))?";
-    static final String INSERT_QUERY = "insert into \\w+\\p{javaWhitespace}*(\\(\\w+(\\p{javaWhitespace}*,\\p{javaWhitespace}*\\w+)*\\))?\\p{javaWhitespace}*values\\p{javaWhitespace}*\\(((\\d+(\\.\\d+)?)|(\"(\\p{Punct}&&[^\"\'])+\"))(\\p{javaWhitespace}*,\\p{javaWhitespace}*((\\d+(\\.\\d+)?)|\"(\\p{Punct}&&[^\"\'])+\"))*\\)";
-    static final String UPDATE_QUERY = "update \\w+ set \\w+\\p{javaWhitespace}*=\\p{javaWhitespace}*(\\d+(\\.\\d+)?)|(\"(\\p{Punct}&&[^\"\'])+\") \\p{javaWhitespace}*(where \\w+(\\p{javaWhitespace}*=\\p{javaWhitespace}*((\\d+(\\.\\d+)?)|(\"(\\p{Punct}&&[^\"\'])+\")))|(\\p{javaWhitespace}+is null)|((\\p{javaWhitespace}+is not null)))?";
-    static final String CREATE_QUERY = "create\\p{javaWhitespace}+table\\p{javaWhitespace}+(\\p{Alpha}\\w*)\\p{javaWhitespace}+\\(((\\p{Alpha}\\w*\\p{javaWhitespace}+\\p{Alpha}+\\p{javaWhitespace}*(\\p{javaWhitespace}+((primary\\p{javaWhitespace}+key)|(not\\p{javaWhitespace}+null)))?\\p{javaWhitespace}*,)*(\\p{Alpha}\\w*\\p{javaWhitespace}+\\p{Alpha}+\\p{javaWhitespace}*(\\p{javaWhitespace}+((primary\\p{javaWhitespace}+key)|(not\\p{javaWhitespace}+null)))?\\p{javaWhitespace}*))\\)";
+    static final String SELECT_QUERY = "select ((\\*)|(\\w+(\\p{javaWhitespace}?,\\p{javaWhitespace}?\\w+)*)) from (\\w+)(where\\p{javaWhitespace}+\\w+(\\p{javaWhitespace}*(=|<=|<|>|>=|<>)\\p{javaWhitespace}*((\\d+(\\.\\d+)?)|\"([\\p{Graph}&&[^\"\']])+\"))|(\\p{javaWhitespace}+is null)|(\\p{javaWhitespace}+is not null))?";
+    static final String INSERT_QUERY = "insert into \\w+\\p{javaWhitespace}*(\\(\\w+(\\p{javaWhitespace}*,\\p{javaWhitespace}*\\w+)*\\))?\\p{javaWhitespace}*values\\p{javaWhitespace}*\\(((\\d+(\\.\\d+)?)|(\"([\\p{Graph}&&[^\"\']])+\"))(\\p{javaWhitespace}*,\\p{javaWhitespace}*((\\d+(\\.\\d+)?)|\"([\\p{Graph}&&[^\"\']])+\"))*\\)";
+    static final String UPDATE_QUERY = "update \\w+ set \\w+\\p{javaWhitespace}*=\\p{javaWhitespace}*(\\d+(\\.\\d+)?)|(\"([\\p{Graph}&&[^\"\']])+\") \\p{javaWhitespace}*(where \\w+(\\p{javaWhitespace}*=\\p{javaWhitespace}*((\\d+(\\.\\d+)?)|(\"([\\p{Graph}&&[^\"\']])+\")))|(\\p{javaWhitespace}+is null)|((\\p{javaWhitespace}+is not null)))?";
+    static final String CREATE_QUERY = "create\\p{javaWhitespace}+table\\p{javaWhitespace}+(\\p{Alpha}\\w*)\\p{javaWhitespace}*\\(((\\p{javaWhitespace}*\\p{Alpha}\\w*\\p{javaWhitespace}+\\p{Alpha}+\\p{javaWhitespace}*(\\p{javaWhitespace}+((primary\\p{javaWhitespace}+key)|(not\\p{javaWhitespace}+null)))?\\p{javaWhitespace}*,)*(\\p{javaWhitespace}*\\p{Alpha}\\w*\\p{javaWhitespace}+\\p{Alpha}+\\p{javaWhitespace}*(\\p{javaWhitespace}+((primary\\p{javaWhitespace}+key)|(not\\p{javaWhitespace}+null)))?\\p{javaWhitespace}*))\\)";
 }

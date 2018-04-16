@@ -262,12 +262,13 @@ public class HelperMethods {
         colNames.add("record_count"); colDataType.add(new DataType("int"));
         colNames.add("root_page"); colDataType.add(new DataType("smallint"));
         for(int i=0;i<colNames.size();++i){
+            catalogTableColFile.seek(0);
             ArrayList<Object> insertionData = new ArrayList<>();
             insertionData.add((Integer)(highestrow_id+1+i));
             insertionData.add(tableName);
             insertionData.add(colNames.get(i));
             insertionData.add(colDataType.get(i).toString());
-            insertionData.add((byte)i);
+            insertionData.add((byte)(i+1));
             if(tci.colNullable.get(i))
                 insertionData.add("YES");
             else
@@ -278,6 +279,7 @@ public class HelperMethods {
             if(curPage==1)
                 if(HelperMethods.writeRecordToFirstPage(catalogTableColFile, record, highestrow_id+1+i))
                     UpdateRecord.setRootPage("davisbase_columns");
+                else{}
             else
                 HelperMethods.writeRecordToPage(catalogTableColFile, record, curPage, highestrow_id+1+i);
             
@@ -299,12 +301,13 @@ public class HelperMethods {
         colNames.add("ordinal_position"); colDataType.add(new DataType("tinyint"));
         colNames.add("is_nullable"); colDataType.add(new DataType("text"));
         for(int i=0;i<colNames.size();++i){
+            catalogTableColFile.seek(0);
             ArrayList<Object> insertionData = new ArrayList<>();
             insertionData.add((Integer)(highestrow_id+1+i));
             insertionData.add(tableName);
             insertionData.add(colNames.get(i));
             insertionData.add(colDataType.get(i).toString());
-            insertionData.add((byte)i);
+            insertionData.add((byte)(i+1));
             if(tci.colNullable.get(i))
                 insertionData.add("YES");
             else
@@ -315,6 +318,7 @@ public class HelperMethods {
             if(curPage==1)
                 if(HelperMethods.writeRecordToFirstPage(catalogTableColFile, record, highestrow_id+1+i))
                     UpdateRecord.setRootPage("davisbase_columns");
+                else{}
             else
                 HelperMethods.writeRecordToPage(catalogTableColFile, record, curPage, highestrow_id+1+i);
             

@@ -59,6 +59,7 @@ public class InsertRecord {
         if(numPages==1)
             if(writeRecordToFirstPage(tableFile,record,row_id,tableName))
                 UpdateRecord.setRootPage(tableName);
+            else{}
         else
             writeRecordToPage(tableFile,record,numPages,row_id,tableName);
 

@@ -274,7 +274,7 @@ public class createQueryHandler {
     private final Matcher createMatcher;
     private final Pattern attrLinePattern;
     private final String ATTR_LINE = "^(?<attrname>\\p{Alpha}\\w*)\\p{javaWhitespace}+(?<datatype>\\p{Alpha}+)\\p{javaWhitespace}*(?<constraints>\\p{javaWhitespace}+((primary\\p{javaWhitespace}+key)|(not\\p{javaWhitespace}+null)))?\\p{javaWhitespace}*,?$";
-    private final String CREATE_QUERY = "^create\\p{javaWhitespace}+table\\p{javaWhitespace}+(?<tablename>\\p{Alpha}\\w*)\\p{javaWhitespace}+\\((?<attrlist>(\\p{Alpha}\\w*\\p{javaWhitespace}+\\p{Alpha}+\\p{javaWhitespace}*(\\p{javaWhitespace}+((primary\\p{javaWhitespace}+key)|(not\\p{javaWhitespace}+null)))?\\p{javaWhitespace}*,)*(\\p{Alpha}\\w*\\p{javaWhitespace}+\\p{Alpha}+\\p{javaWhitespace}*(\\p{javaWhitespace}+((primary\\p{javaWhitespace}+key)|(not\\p{javaWhitespace}+null)))?\\p{javaWhitespace}*))\\)$";
+    private final String CREATE_QUERY = "^create\\p{javaWhitespace}+table\\p{javaWhitespace}+(?<tablename>\\p{Alpha}\\w*)\\p{javaWhitespace}*\\((?<attrlist>(\\p{javaWhitespace}*\\p{Alpha}\\w*\\p{javaWhitespace}+\\p{Alpha}+\\p{javaWhitespace}*(\\p{javaWhitespace}+((primary\\p{javaWhitespace}+key)|(not\\p{javaWhitespace}+null)))?\\p{javaWhitespace}*,)*(\\p{javaWhitespace}*\\p{Alpha}\\w*\\p{javaWhitespace}+\\p{Alpha}+\\p{javaWhitespace}*(\\p{javaWhitespace}+((primary\\p{javaWhitespace}+key)|(not\\p{javaWhitespace}+null)))?\\p{javaWhitespace}*))\\)$";
     
     public static final Boolean[] TABLEMETADATACOLNULLABLE;
     public static final DataType[] TABLEMETADATACOLDATATYPES;
