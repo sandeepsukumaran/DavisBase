@@ -123,7 +123,11 @@ public class selectQueryHandler {
         if (!tableNames.contains(tableName))
             throw new NoSuchTableException(tableName);
         else;
-        ArrayList<String> selectcols = new ArrayList<>(Arrays.asList(selectMatcher.group("columnnames").split(",")));
+        String[] selectcolsarr = selectMatcher.group("columnnames").split(",");
+        //ArrayList<String> selectcols = new ArrayList<>(Arrays.asList(selectcolsarr));
+        ArrayList<String> selectcols = new ArrayList<>();
+        for(String selectcol:selectcolsarr)
+            selectcols.add(selectcol.trim());
         ArrayList<String> tablecols = DavisBase.getTableColumns(tableName);
         
         if (!tablecols.containsAll(selectcols)){
@@ -182,6 +186,6 @@ public class selectQueryHandler {
     private final Matcher selectAllMatcher;
     private final Matcher selectMatcher;
     private final String query;
-    private final String SELECT_ALL_QUERY = "^select \\* from (?<tablename>\\w+)(?<whereclause>\\p{javaWhitespace}+where\\p{javaWhitespace}+\\w+(\\p{javaWhitespace}*(=|<=|<|>|>=|<>)\\p{javaWhitespace}*((\\d+(\\.\\d+)?)|\"([\\p{Graph}&&[^\"\']])+\"))|(\\p{javaWhitespace}+is null)|(\\p{javaWhitespace}+is not null))?$";
-    private static final String SELECT_QUERY = "^select (?<columnnames>\\w+(\\p{javaWhitespace}?,\\p{javaWhitespace}?\\w+)*) from (<?tablename>\\w+)(?<whereclause>\\p{javaWhitespace}+where\\p{javaWhitespace}+\\w+(\\p{javaWhitespace}*(=|<=|<|>|>=|<>)\\p{javaWhitespace}*((\\d+(\\.\\d+)?)|\"([\\p{Graph}&&[^\"\']])+\"))|(\\p{javaWhitespace}+is null)|(\\p{javaWhitespace}+is not null))?$";
+    private final String SELECT_ALL_QUERY = "^select \\* from (?<tablename>\\w+)(?<whereclause>\\p{javaWhitespace}+where\\p{javaWhitespace}+\\w+((\\p{javaWhitespace}*(=|<=|<|>|>=|<>)\\p{javaWhitespace}*((\\d+(\\.\\d+)?)|(\"([\\p{Graph}&&[^\"\']])+\")))|(\\p{javaWhitespace}+is null)|(\\p{javaWhitespace}+is not null)))?$";
+    private static final String SELECT_QUERY = "^select (?<columnnames>\\w+(\\p{javaWhitespace}?,\\p{javaWhitespace}?\\w+)*) from (?<tablename>\\w+)(?<whereclause>\\p{javaWhitespace}+where\\p{javaWhitespace}+\\w+((\\p{javaWhitespace}*(=|<=|<|>|>=|<>)\\p{javaWhitespace}*((\\d+(\\.\\d+)?)|(\"([\\p{Graph}&&[^\"\']])+\")))|(\\p{javaWhitespace}+is null)|(\\p{javaWhitespace}+is not null)))?$";
 }

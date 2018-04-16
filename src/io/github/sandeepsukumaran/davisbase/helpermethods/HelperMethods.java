@@ -270,9 +270,9 @@ public class HelperMethods {
             insertionData.add(colDataType.get(i).toString());
             insertionData.add((byte)(i+1));
             if(tci.colNullable.get(i))
-                insertionData.add("YES");
+                insertionData.add("yes");
             else
-                insertionData.add("NO");
+                insertionData.add("no");
             
             byte[] record = insertQueryHandler.buildRecord(insertionData, tci, tci.colNullable);
             
@@ -309,9 +309,9 @@ public class HelperMethods {
             insertionData.add(colDataType.get(i).toString());
             insertionData.add((byte)(i+1));
             if(tci.colNullable.get(i))
-                insertionData.add("YES");
+                insertionData.add("yes");
             else
-                insertionData.add("NO");
+                insertionData.add("no");
             
             byte[] record = insertQueryHandler.buildRecord(insertionData, tci, tci.colNullable);
             

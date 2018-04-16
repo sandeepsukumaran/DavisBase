@@ -247,6 +247,8 @@ public class ReadRows {
             Object targetValue=null;
             switch(schema.colDataTypes.get(colNum).getDataTypeAsInt()){
                 case 1://tinyint
+                    targetValue = Byte.parseByte(tarValue);
+                    break;
                 case 2://smallint
                     targetValue = Short.parseShort(tarValue);
                     break;
@@ -265,7 +267,8 @@ public class ReadRows {
                     targetValue = Double.parseDouble(tarValue);
                     break;
                 case 9:
-                    targetValue = tarValue;       
+                    targetValue = tarValue.substring(1,tarValue.length()-1);//get rid of quotes  
+                    break;
             }
             
             int curPage = 1;
