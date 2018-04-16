@@ -50,17 +50,17 @@ public class UpdateRecord {
             long pageStart = (curPage-1)*DavisBase.PAGESIZE;
             tableFile.seek(pageStart);
             tableFile.skipBytes(1); //unused- will be page type
-            int numRecordsInPage = tableFile.readByte();
+            byte numRecordsInPage = tableFile.readByte();
             tableFile.skipBytes(2);//unused will be start of cell area
             int nextPage = tableFile.readInt();
             ArrayList<Short> cellLocations = new ArrayList<>();
-            for(int i=0;i<numRecordsInPage;++i)
+            for(byte i=0;i<numRecordsInPage;++i)
                 cellLocations.add(tableFile.readShort());
 
             for(Short cellLocation:cellLocations){
                 tableFile.seek(pageStart+cellLocation);
                 tableFile.skipBytes(7);//skip over header+numColumns
-                int nameLen = tableFile.readByte()-0x0c;
+                byte nameLen = (byte)(tableFile.readByte()-0x0c);
                 tableFile.skipBytes(2);//skip over length of record_count and root_page
                 byte[] b = new byte[nameLen];
                 tableFile.read(b);
@@ -72,6 +72,51 @@ public class UpdateRecord {
                 int curCount = tableFile.readInt();
                 tableFile.seek(pos);
                 tableFile.writeInt(curCount+1);
+                return;
+            }
+            curPage = nextPage;
+        }
+    }
+    public static void incrementRecordCount(String tableName,int count) throws MissingTableFileException, FileNotFoundException, InvalidTableInformationException, IOException{
+        String workingDirectory = System.getProperty("user.dir"); // gets current working directory
+        String absoluteFilePath = workingDirectory + File.separator + "data" + File.separator + "catalog" + File.separator + "davisbase_tables.tbl";
+        File file = new File(absoluteFilePath);
+        if (!(file.exists() && !file.isDirectory())){
+            throw new MissingTableFileException("davisbase_tables");
+        }else;
+        
+        RandomAccessFile tableFile = new RandomAccessFile(absoluteFilePath, "rw");
+        if(tableFile.length() < DavisBase.PAGESIZE) //no meta data information found
+            throw new InvalidTableInformationException("davisbase_tables");
+        else;
+        
+        int curPage=1;
+        while(curPage!=-1){
+            long pageStart = (curPage-1)*DavisBase.PAGESIZE;
+            tableFile.seek(pageStart);
+            tableFile.skipBytes(1); //unused- will be page type
+            byte numRecordsInPage = tableFile.readByte();
+            tableFile.skipBytes(2);//unused will be start of cell area
+            int nextPage = tableFile.readInt();
+            ArrayList<Short> cellLocations = new ArrayList<>();
+            for(byte i=0;i<numRecordsInPage;++i)
+                cellLocations.add(tableFile.readShort());
+
+            for(Short cellLocation:cellLocations){
+                tableFile.seek(pageStart+cellLocation);
+                tableFile.skipBytes(7);//skip over header+numColumns
+                byte nameLen = (byte)(tableFile.readByte()-0x0c);
+                tableFile.skipBytes(2);//skip over length of record_count and root_page
+                byte[] b = new byte[nameLen];
+                tableFile.read(b);
+                String tblName = new String(b);
+                if(!tblName.equals(tableName))
+                    continue;
+                else{}
+                long pos = tableFile.getFilePointer();
+                int curCount = tableFile.readInt();
+                tableFile.seek(pos);
+                tableFile.writeInt(curCount+count);
                 return;
             }
             curPage = nextPage;
@@ -95,17 +140,17 @@ public class UpdateRecord {
             long pageStart = (curPage-1)*DavisBase.PAGESIZE;
             tableFile.seek(pageStart);
             tableFile.skipBytes(1); //unused- will be page type
-            int numRecordsInPage = tableFile.readByte();
+            byte numRecordsInPage = tableFile.readByte();
             tableFile.skipBytes(2);//unused will be start of cell area
             int nextPage = tableFile.readInt();
             ArrayList<Short> cellLocations = new ArrayList<>();
-            for(int i=0;i<numRecordsInPage;++i)
+            for(byte i=0;i<numRecordsInPage;++i)
                 cellLocations.add(tableFile.readShort());
 
             for(Short cellLocation:cellLocations){
                 tableFile.seek(pageStart+cellLocation);
                 tableFile.skipBytes(7);//skip over header+numColumns
-                int nameLen = tableFile.readByte();
+                byte nameLen = (byte)(tableFile.readByte()-0x0c);
                 tableFile.skipBytes(2);//skip over length of record_count and root_page
                 byte[] b = new byte[nameLen];
                 tableFile.read(b);
@@ -117,6 +162,51 @@ public class UpdateRecord {
                 int curCount = tableFile.readInt();
                 tableFile.seek(pos);
                 tableFile.writeInt(curCount-1);
+                return;
+            }
+            curPage = nextPage;
+        }
+    }
+    public static void decrementRecordCount(String tableName,int count) throws MissingTableFileException, FileNotFoundException, IOException, InvalidTableInformationException{
+        String workingDirectory = System.getProperty("user.dir"); // gets current working directory
+        String absoluteFilePath = workingDirectory + File.separator + "data" + File.separator + "catalog" + File.separator + "davisbase_tables.tbl";
+        File file = new File(absoluteFilePath);
+        if (!(file.exists() && !file.isDirectory())){
+            throw new MissingTableFileException("davisbase_tables");
+        }else;
+        
+        RandomAccessFile tableFile = new RandomAccessFile(absoluteFilePath, "rw");
+        if(tableFile.length() < DavisBase.PAGESIZE) //no meta data information found
+            throw new InvalidTableInformationException("davisbase_tables");
+        else;
+        
+        int curPage=1;
+        while(curPage!=-1){
+            long pageStart = (curPage-1)*DavisBase.PAGESIZE;
+            tableFile.seek(pageStart);
+            tableFile.skipBytes(1); //unused- will be page type
+            byte numRecordsInPage = tableFile.readByte();
+            tableFile.skipBytes(2);//unused will be start of cell area
+            int nextPage = tableFile.readInt();
+            ArrayList<Short> cellLocations = new ArrayList<>();
+            for(byte i=0;i<numRecordsInPage;++i)
+                cellLocations.add(tableFile.readShort());
+
+            for(Short cellLocation:cellLocations){
+                tableFile.seek(pageStart+cellLocation);
+                tableFile.skipBytes(7);//skip over header+numColumns
+                byte nameLen = (byte)(tableFile.readByte()-0x0c);
+                tableFile.skipBytes(2);//skip over length of record_count and root_page
+                byte[] b = new byte[nameLen];
+                tableFile.read(b);
+                String tblName = new String(b);
+                if(!tblName.equals(tableName))
+                    continue;
+                else{}
+                long pos = tableFile.getFilePointer();
+                int curCount = tableFile.readInt();
+                tableFile.seek(pos);
+                tableFile.writeInt(curCount-count);
                 return;
             }
             curPage = nextPage;
