@@ -1,0 +1,28 @@
+/*
+ * Copyright (C) 2018 sandeep
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package io.github.sandeepsukumaran.davisbase.query;
+
+/**
+ *
+ * @author sandeep
+ */
+public class dropQueryHandler {
+    public dropQueryHandler(){}
+    //baseic idea: in davisbase_columns read entry, if table name matches, delete that entry from list of pointers.
+    // easy since we read list of cell locations. do same for davisbase_tables entry
+    //AND decrement row count
+}

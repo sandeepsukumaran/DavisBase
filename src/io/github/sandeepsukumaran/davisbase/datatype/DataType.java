@@ -45,6 +45,30 @@ public class DataType {
     public static int getDataTypeSize(String dType){
         return DATATYPESIZE.get(DATATYPEINDEX.get(dType));
     }
+    public static int getDataTypeSize(byte b){
+        switch(b){
+            case 0:
+            case 4:
+                return 1;
+            case 1:
+            case 5:
+                return 2;
+            case 2:
+            case 6:
+            case 8:
+                return 4;
+            case 3:
+            case 7:
+            case 9:
+            case 0x0a:
+            case 0x0b:
+                return 8;
+            case 0x0c:
+                return 1;
+            default:
+                return b - 0x0c;
+        }
+    }
     @Override
     public String toString(){
         switch(type){

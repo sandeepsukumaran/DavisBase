@@ -21,6 +21,7 @@ import io.github.sandeepsukumaran.davisbase.exception.InvalidDataTypeName;
 import io.github.sandeepsukumaran.davisbase.exception.InvalidPKException;
 import io.github.sandeepsukumaran.davisbase.exception.InvalidTableInformationException;
 import io.github.sandeepsukumaran.davisbase.exception.MissingTableFileException;
+import io.github.sandeepsukumaran.davisbase.exception.NoPKException;
 import io.github.sandeepsukumaran.davisbase.exception.TableAlreadyExistsException;
 import io.github.sandeepsukumaran.davisbase.helpermethods.HelperMethods;
 import io.github.sandeepsukumaran.davisbase.main.DavisBase;
@@ -44,6 +45,7 @@ public class createQueryHandler {
     query = inputQuery;
     createPattern = Pattern.compile(CREATE_QUERY);
     createMatcher = createPattern.matcher(query);
+    createMatcher.matches();
     attrLinePattern = Pattern.compile(ATTR_LINE);
     }
     
@@ -67,15 +69,16 @@ public class createQueryHandler {
      * @throws java.io.FileNotFoundException
      * @throws io.github.sandeepsukumaran.davisbase.exception.MissingTableFileException
      * @throws io.github.sandeepsukumaran.davisbase.exception.InvalidTableInformationException
+     * @throws io.github.sandeepsukumaran.davisbase.exception.NoPKException
      */
-    public void execute() throws TableAlreadyExistsException, InvalidDataTypeName, InvalidPKException, FileNotFoundException, IOException, MissingTableFileException, InvalidTableInformationException{
+    public void execute() throws TableAlreadyExistsException, InvalidDataTypeName, InvalidPKException, FileNotFoundException, IOException, MissingTableFileException, InvalidTableInformationException, NoPKException{
         ArrayList<String> tableNames = DavisBase.getTableNames();
         String tableName = createMatcher.group("tablename");
         if (tableNames.contains(tableName))
             throw new TableAlreadyExistsException(tableName);
         else;
         String attributes = createMatcher.group("attrlist");
-        attributes = attributes.substring(1,attributes.length()-1);//remove first and last ( and )
+        attributes = attributes.trim();//substring(1,attributes.length()-1);//remove first and last ( and )
         //split into individual attribute declarations based on commas outside quotation marks
         String[] attributeLines = attributes.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1);
         
@@ -85,7 +88,9 @@ public class createQueryHandler {
         
         Matcher attrLineMatcher;
         for(String attrline:attributeLines){
+            attrline = attrline.trim();
             attrLineMatcher = attrLinePattern.matcher(attrline);
+            attrLineMatcher.matches();
             String attrname = attrLineMatcher.group("attrname");
             String dtype = attrLineMatcher.group("datatype");
             String constraints = attrLineMatcher.group("constraints");//may be null
@@ -123,6 +128,9 @@ public class createQueryHandler {
         
         //rearranging so that row_id PRIMARY KEY is always first. Violates ordinal_position but no time to fix it.
         int pkindex = colNames.indexOf("row_id");
+        if(pkindex==-1)
+            throw new NoPKException();
+        else{}
         colNames.remove(pkindex);
         colNames.add(0,"row_id");
         colDataType.remove(pkindex);
@@ -162,7 +170,7 @@ public class createQueryHandler {
         tableFile.seek(0);
         tableFile.writeByte(0x0d);//type of page - leaf
         tableFile.writeByte(0x00);//no records in file
-        tableFile.writeByte((byte)DavisBase.PAGESIZE);//start of cell area is at the very end of file
+        tableFile.writeShort((short)DavisBase.PAGESIZE);//start of cell area is at the very end of file
         tableFile.writeInt(-1);//no sibling
         tableFile.close();
         
@@ -196,7 +204,7 @@ public class createQueryHandler {
         insertionData.add((Integer)(highestrow_id+1));
         insertionData.add(tableName);
         insertionData.add((Integer)(0));
-        insertionData.add((Integer)(1));
+        insertionData.add((Short)((short)1));
         
         TableColumnInfo tci = new TableColumnInfo();
         tci.numCols = TABLEMETADATANUMCOLS;
@@ -209,6 +217,7 @@ public class createQueryHandler {
         if(curPage==1)
             if(HelperMethods.writeRecordToFirstPage(file, record, highestrow_id+1))
                 UpdateRecord.setRootPage("davisbase_tables");
+            else{}
         else
             HelperMethods.writeRecordToPage(file, record, curPage, highestrow_id+1);
     }
@@ -247,20 +256,22 @@ public class createQueryHandler {
             insertionData.add(tableName);
             insertionData.add(colNames.get(i));
             insertionData.add(colDataType.get(i).toString());
-            insertionData.add((byte)i);
+            insertionData.add((byte)(i+1));
             if(nullability.get(i))
-                insertionData.add("YES");
+                insertionData.add("yes");
             else
-                insertionData.add("NO");
+                insertionData.add("no");
             
             byte[] record = insertQueryHandler.buildRecord(insertionData, tci, tci.colNullable);
-            
+            //System.out.println(Arrays.toString(record));
             if(curPage==1)
                 if(HelperMethods.writeRecordToFirstPage(file, record, highestrow_id+1+i))
                     UpdateRecord.setRootPage("davisbase_columns");
+                else{}
             else
                 HelperMethods.writeRecordToPage(file, record, curPage, highestrow_id+1+i);
             
+            UpdateRecord.incrementRecordCount("davisbase_columns");
             numPages = (int)(file.length()/DavisBase.PAGESIZE);
             if(numPages==3)
                 curPage=2;
@@ -273,7 +284,7 @@ public class createQueryHandler {
     private final Pattern createPattern;
     private final Matcher createMatcher;
     private final Pattern attrLinePattern;
-    private final String ATTR_LINE = "^(?<attrname>\\p{Alpha}\\w*)\\p{javaWhitespace}+(?<datatype>\\p{Alpha}+)\\p{javaWhitespace}*(?<constraints>\\p{javaWhitespace}+((primary\\p{javaWhitespace}+key)|(not\\p{javaWhitespace}+null)))?\\p{javaWhitespace}*,?$";
+    private final String ATTR_LINE = "^(?<attrname>\\p{Alpha}\\w*)\\p{javaWhitespace}+(?<datatype>\\p{Alpha}+)\\p{javaWhitespace}*(?<constraints>\\p{javaWhitespace}+((primary\\p{javaWhitespace}+key)|(not\\p{javaWhitespace}+null)))?\\p{javaWhitespace}*$";
     private final String CREATE_QUERY = "^create\\p{javaWhitespace}+table\\p{javaWhitespace}+(?<tablename>\\p{Alpha}\\w*)\\p{javaWhitespace}*\\((?<attrlist>(\\p{javaWhitespace}*\\p{Alpha}\\w*\\p{javaWhitespace}+\\p{Alpha}+\\p{javaWhitespace}*(\\p{javaWhitespace}+((primary\\p{javaWhitespace}+key)|(not\\p{javaWhitespace}+null)))?\\p{javaWhitespace}*,)*(\\p{javaWhitespace}*\\p{Alpha}\\w*\\p{javaWhitespace}+\\p{Alpha}+\\p{javaWhitespace}*(\\p{javaWhitespace}+((primary\\p{javaWhitespace}+key)|(not\\p{javaWhitespace}+null)))?\\p{javaWhitespace}*))\\)$";
     
     public static final Boolean[] TABLEMETADATACOLNULLABLE;

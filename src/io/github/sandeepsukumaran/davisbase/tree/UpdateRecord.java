@@ -60,7 +60,7 @@ public class UpdateRecord {
             for(Short cellLocation:cellLocations){
                 tableFile.seek(pageStart+cellLocation);
                 tableFile.skipBytes(7);//skip over header+numColumns
-                int nameLen = tableFile.readByte();
+                int nameLen = tableFile.readByte()-0x0c;
                 tableFile.skipBytes(2);//skip over length of record_count and root_page
                 byte[] b = new byte[nameLen];
                 tableFile.read(b);
@@ -140,7 +140,7 @@ public class UpdateRecord {
             long pageStart = (curPage-1)*DavisBase.PAGESIZE;
             tableFile.seek(pageStart);
             tableFile.skipBytes(1); //unused- will be page type
-            int numRecordsInPage = tableFile.readByte();
+            byte numRecordsInPage = tableFile.readByte();
             tableFile.skipBytes(2);//unused will be start of cell area
             int nextPage = tableFile.readInt();
             ArrayList<Short> cellLocations = new ArrayList<>();
@@ -150,7 +150,7 @@ public class UpdateRecord {
             for(Short cellLocation:cellLocations){
                 tableFile.seek(pageStart+cellLocation);
                 tableFile.skipBytes(7);//skip over header+numColumns
-                int nameLen = tableFile.readByte();
+                byte nameLen = (byte)(tableFile.readByte()-0x0c);
                 tableFile.skipBytes(2);//skip over lengths of record_count and root_page
                 byte[] b = new byte[nameLen];
                 tableFile.read(b);

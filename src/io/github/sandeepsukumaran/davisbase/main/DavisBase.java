@@ -11,6 +11,8 @@ import io.github.sandeepsukumaran.davisbase.exception.BadInputValueException;
 import io.github.sandeepsukumaran.davisbase.exception.ColumnCannotBeNullException;
 import io.github.sandeepsukumaran.davisbase.exception.FileAccessException;
 import io.github.sandeepsukumaran.davisbase.exception.InvalidDataType;
+import io.github.sandeepsukumaran.davisbase.exception.InvalidDataTypeName;
+import io.github.sandeepsukumaran.davisbase.exception.InvalidPKException;
 import io.github.sandeepsukumaran.davisbase.exception.InvalidQuerySyntaxException;
 import io.github.sandeepsukumaran.davisbase.exception.InvalidTableInformationException;
 import io.github.sandeepsukumaran.davisbase.exception.MissingTableFileException;
@@ -18,8 +20,10 @@ import java.util.Scanner;
 
 import io.github.sandeepsukumaran.davisbase.query.queryParser;
 import io.github.sandeepsukumaran.davisbase.exception.NoDatabaseSelectedException;
+import io.github.sandeepsukumaran.davisbase.exception.NoPKException;
 import io.github.sandeepsukumaran.davisbase.exception.NoSuchColumnException;
 import io.github.sandeepsukumaran.davisbase.exception.NoSuchTableException;
+import io.github.sandeepsukumaran.davisbase.exception.TableAlreadyExistsException;
 import io.github.sandeepsukumaran.davisbase.helpermethods.HelperMethods;
 import io.github.sandeepsukumaran.davisbase.tableinformation.TableColumnInfo;
 import java.io.File;
@@ -116,7 +120,7 @@ public class DavisBase {
                 queryParser.parseInputCommand(inputString);
             }catch(NoDatabaseSelectedException e){
                 System.out.println("\nERROR 1046 : No database selected.");
-            }catch(InvalidQuerySyntaxException|NoSuchTableException|NoSuchColumnException|FileAccessException|MissingTableFileException|InvalidDataType|ArgumentCountMismatchException | BadInputValueException | InvalidTableInformationException | IOException | ColumnCannotBeNullException e){
+            }catch(TableAlreadyExistsException|InvalidDataTypeName|InvalidPKException|NoPKException|InvalidQuerySyntaxException|NoSuchTableException|NoSuchColumnException|FileAccessException|MissingTableFileException|InvalidDataType|ArgumentCountMismatchException | BadInputValueException | InvalidTableInformationException | IOException | ColumnCannotBeNullException e){
                 System.out.println(e);
                 e.printStackTrace();
             }

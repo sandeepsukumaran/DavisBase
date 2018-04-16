@@ -21,10 +21,6 @@ import io.github.sandeepsukumaran.davisbase.exception.InvalidTableInformationExc
 import io.github.sandeepsukumaran.davisbase.exception.MissingTableFileException;
 import io.github.sandeepsukumaran.davisbase.main.DavisBase;
 import io.github.sandeepsukumaran.davisbase.query.createQueryHandler;
-import static io.github.sandeepsukumaran.davisbase.query.createQueryHandler.TABLECOLMETADATACOLDATATYPES;
-import static io.github.sandeepsukumaran.davisbase.query.createQueryHandler.TABLECOLMETADATACOLNAMES;
-import static io.github.sandeepsukumaran.davisbase.query.createQueryHandler.TABLECOLMETADATACOLNULLABLE;
-import static io.github.sandeepsukumaran.davisbase.query.createQueryHandler.TABLECOLMETADATANUMCOLS;
 import io.github.sandeepsukumaran.davisbase.query.insertQueryHandler;
 import io.github.sandeepsukumaran.davisbase.tableinformation.TableColumnInfo;
 import io.github.sandeepsukumaran.davisbase.tree.UpdateRecord;
@@ -56,6 +52,7 @@ public class HelperMethods {
     }
     
     public static boolean writeRecordToFirstPage(RandomAccessFile tableFile, byte[] record,int row_id) throws IOException, MissingTableFileException, FileNotFoundException, InvalidTableInformationException{
+        tableFile.seek(0);
         tableFile.skipBytes(1);//skip over page type - will be0x0d
         short numCols = tableFile.readByte();
         short cellStart = tableFile.readShort();
@@ -84,18 +81,18 @@ public class HelperMethods {
             tableFile.seek(DavisBase.PAGESIZE);
             tableFile.writeByte(13);//0x0d
             tableFile.writeByte(1);
-            tableFile.writeShort((short)(2*DavisBase.PAGESIZE - record.length));
+            tableFile.writeShort((short)(2*DavisBase.PAGESIZE - record.length - DavisBase.PAGESIZE));
             tableFile.writeInt(-1);
-            tableFile.writeShort((short)(2*DavisBase.PAGESIZE - record.length));
+            tableFile.writeShort((short)(2*DavisBase.PAGESIZE - record.length - DavisBase.PAGESIZE));
             tableFile.seek(2*DavisBase.PAGESIZE - record.length);
             tableFile.write(record);
             //write parent page
             tableFile.seek(2*DavisBase.PAGESIZE);
             tableFile.writeByte(5);//0x05
             tableFile.writeByte(1);
-            tableFile.writeShort((short)(3*DavisBase.PAGESIZE - 8));
+            tableFile.writeShort((short)(3*DavisBase.PAGESIZE - 8 - DavisBase.PAGESIZE));
             tableFile.writeInt(2);
-            tableFile.writeShort((short)(3*DavisBase.PAGESIZE - 8));
+            tableFile.writeShort((short)(3*DavisBase.PAGESIZE - 8 - DavisBase.PAGESIZE));
             tableFile.seek(3*DavisBase.PAGESIZE - 8);
             tableFile.writeInt(1);
             tableFile.writeInt(row_id);
@@ -110,7 +107,7 @@ public class HelperMethods {
         
         tableFile.seek((pageNum-1)*DavisBase.PAGESIZE);
         tableFile.skipBytes(1);//skip over page type - will be0x0d
-        short numCols = tableFile.readByte();
+        byte numCols = tableFile.readByte();
         short cellStart = tableFile.readShort();
         int headerEnd = 8+2*numCols;
         if(record.length+2 <= cellStart-headerEnd){
@@ -141,20 +138,20 @@ public class HelperMethods {
             tableFile.seek((curPage-1)*DavisBase.PAGESIZE);
             tableFile.writeByte(13);//0x0d
             tableFile.writeByte(1);
-            tableFile.writeShort((short)(curPage*DavisBase.PAGESIZE - record.length));
+            tableFile.writeShort((short)(curPage*DavisBase.PAGESIZE - record.length - DavisBase.PAGESIZE));
             tableFile.writeInt(-1);
-            tableFile.writeShort((short)(curPage*DavisBase.PAGESIZE - record.length));
+            tableFile.writeShort((short)(curPage*DavisBase.PAGESIZE - record.length - DavisBase.PAGESIZE));
             tableFile.seek(curPage*DavisBase.PAGESIZE - record.length);
             tableFile.write(record);
             //write parent page
             tableFile.seek(2*DavisBase.PAGESIZE);
             tableFile.skipBytes(1);//0x05
             long fp = tableFile.getFilePointer();
-            int numcells = tableFile.readByte();
+            byte numcells = tableFile.readByte();
             tableFile.seek(fp);
             tableFile.writeByte(numcells+1);
             fp = tableFile.getFilePointer();
-            int cellstart = tableFile.readShort();
+            short cellstart = tableFile.readShort();
             tableFile.seek(fp);
             tableFile.writeShort(cellstart-8);
             tableFile.writeInt(curPage);

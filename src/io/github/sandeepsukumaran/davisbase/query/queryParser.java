@@ -16,19 +16,28 @@
  */
 package io.github.sandeepsukumaran.davisbase.query;
 
+import io.github.sandeepsukumaran.davisbase.display.Display;
 import io.github.sandeepsukumaran.davisbase.exception.ArgumentCountMismatchException;
 import io.github.sandeepsukumaran.davisbase.exception.BadInputValueException;
 import io.github.sandeepsukumaran.davisbase.exception.ColumnCannotBeNullException;
 import io.github.sandeepsukumaran.davisbase.exception.FileAccessException;
 import io.github.sandeepsukumaran.davisbase.exception.InvalidDataType;
+import io.github.sandeepsukumaran.davisbase.exception.InvalidDataTypeName;
+import io.github.sandeepsukumaran.davisbase.exception.InvalidPKException;
 import io.github.sandeepsukumaran.davisbase.exception.InvalidQuerySyntaxException;
 import io.github.sandeepsukumaran.davisbase.exception.InvalidTableInformationException;
 import io.github.sandeepsukumaran.davisbase.exception.MissingTableFileException;
 import io.github.sandeepsukumaran.davisbase.main.DavisBase;
 import io.github.sandeepsukumaran.davisbase.exception.NoDatabaseSelectedException;
+import io.github.sandeepsukumaran.davisbase.exception.NoPKException;
 import io.github.sandeepsukumaran.davisbase.exception.NoSuchColumnException;
 import io.github.sandeepsukumaran.davisbase.exception.NoSuchTableException;
+import io.github.sandeepsukumaran.davisbase.exception.TableAlreadyExistsException;
+import io.github.sandeepsukumaran.davisbase.result.ResultSet;
+import io.github.sandeepsukumaran.davisbase.result.ResultSetRow;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 /**
  *
  * @author Sandeep
@@ -49,8 +58,13 @@ public class queryParser {
      * @throws io.github.sandeepsukumaran.davisbase.exception.InvalidTableInformationException
      * @throws java.io.IOException
      * @throws io.github.sandeepsukumaran.davisbase.exception.ColumnCannotBeNullException
+     * @throws io.github.sandeepsukumaran.davisbase.exception.TableAlreadyExistsException
+     * @throws io.github.sandeepsukumaran.davisbase.exception.InvalidDataTypeName
+     * @throws io.github.sandeepsukumaran.davisbase.exception.InvalidPKException
+     * @throws java.io.FileNotFoundException
+     * @throws io.github.sandeepsukumaran.davisbase.exception.NoPKException
      */
-    public static void parseInputCommand(String inputCommand) throws NoDatabaseSelectedException,InvalidQuerySyntaxException,NoSuchTableException,NoSuchColumnException, FileAccessException, MissingTableFileException, InvalidDataType, ArgumentCountMismatchException, BadInputValueException, InvalidTableInformationException, IOException, ColumnCannotBeNullException{
+    public static void parseInputCommand(String inputCommand) throws NoDatabaseSelectedException,InvalidQuerySyntaxException,NoSuchTableException,NoSuchColumnException, FileAccessException, MissingTableFileException, InvalidDataType, ArgumentCountMismatchException, BadInputValueException, InvalidTableInformationException, IOException, ColumnCannotBeNullException, TableAlreadyExistsException, InvalidDataTypeName, InvalidPKException, FileNotFoundException, NoPKException{
         switch(inputCommand){
             case EXIT_COMMAND:
                 io.github.sandeepsukumaran.davisbase.main.DavisBase.exitFlag = true;
@@ -73,7 +87,7 @@ public class queryParser {
         else if(inputCommand.matches(UPDATE_QUERY))
             System.out.println("Update query");//new updateQueryHandler(inputCommand).execute();
         else if(inputCommand.matches(CREATE_QUERY))
-            System.out.println("Create query");
+            new createQueryHandler(inputCommand).execute();
         else
             throw new InvalidQuerySyntaxException();
     }
@@ -89,7 +103,15 @@ public class queryParser {
     private static void showTables() throws NoDatabaseSelectedException{
         if (DavisBase.activeDatabase == null)
             throw new NoDatabaseSelectedException();
-        return;
+        ArrayList<String> columns = new ArrayList<>();
+        columns.add("table_name");
+        ResultSet rs = new ResultSet();
+        for(String tableName:DavisBase.tableNames){
+            ResultSetRow rsr = new ResultSetRow();
+            rsr.contents.add(tableName);
+            rs.data.add(rsr);
+        }
+        Display.displayResults(columns,rs);
     }
     private static void displayHelpText(){
         System.out.println("\n\nFor developer information visit:\n\thttps://sandeepsukumaran.github.io/DavisBase\n\n");
