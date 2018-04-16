@@ -56,7 +56,12 @@ public class ReadRows {
         
         
             String workingDirectory = System.getProperty("user.dir"); // gets current working directory
-            String absoluteFilePath = workingDirectory + File.separator + "data" + File.separator + "user_data" + File.separator + tableName+".tbl";
+            String subfolder;
+            if(tableName.equals("davisbase_tables")||tableName.equals("davisbase_columns"))
+                subfolder = "catalog";
+            else
+                subfolder = "user_data";
+            String absoluteFilePath = workingDirectory + File.separator + "data" + File.separator + subfolder + File.separator + tableName+".tbl";
             File file = new File(absoluteFilePath);
             if (!(file.exists() && !file.isDirectory())){
                 throw new MissingTableFileException(tableName);
@@ -87,7 +92,8 @@ public class ReadRows {
                     tableFile.skipBytes(1);//skip over number of columns
                     ArrayList<Boolean> isnull = new ArrayList<>();
                     HashMap<Integer,Integer> textFieldLength = new HashMap<>();
-                    for(int col=0;col<schema.numCols;++col){
+                    isnull.add(false);//row_id
+                    for(int col=1;col<schema.numCols;++col){
                         int serialTypeCode = tableFile.readByte();
                         if (serialTypeCode<4)
                             isnull.add(true);
@@ -101,7 +107,8 @@ public class ReadRows {
                     
                     //read record data
                     ResultSetRow rsr = new ResultSetRow();
-                    for(int col=0;col<schema.numCols;++col){
+                    rsr.contents.add(DataType.dataAsString(3,row_id));
+                    for(int col=1;col<schema.numCols;++col){
                         switch(schema.colDataTypes.get(col).getDataTypeAsInt()){
                             case 1://TINYINT
                                 if(isnull.get(col)){
@@ -120,6 +127,7 @@ public class ReadRows {
                                     int val = tableFile.readShort();
                                     rsr.contents.add(DataType.dataAsString(2,val));
                                 }
+                                break;
                             case 3://INT
                                 if(isnull.get(col)){
                                     rsr.contents.add("NULL");
@@ -128,6 +136,7 @@ public class ReadRows {
                                     int val = tableFile.readInt();
                                     rsr.contents.add(DataType.dataAsString(3,val));
                                 }
+                                break;
                             case 4://BIGINT
                                 if(isnull.get(col)){
                                     rsr.contents.add("NULL");
@@ -136,6 +145,7 @@ public class ReadRows {
                                     long val = tableFile.readLong();
                                     rsr.contents.add(DataType.dataAsString(4,val));
                                 }
+                                break;
                             case 5://REAL
                                 if(isnull.get(col)){
                                     rsr.contents.add("NULL");
@@ -144,6 +154,7 @@ public class ReadRows {
                                     float val = tableFile.readFloat();
                                     rsr.contents.add(DataType.dataAsString(5,val));
                                 }
+                                break;
                             case 6://DOUBLE
                                 if(isnull.get(col)){
                                     rsr.contents.add("NULL");
@@ -152,6 +163,7 @@ public class ReadRows {
                                     double val = tableFile.readDouble();
                                     rsr.contents.add(DataType.dataAsString(6,val));
                                 }
+                                break;
                             case 7://DATETIME
                                 if(isnull.get(col)){
                                     rsr.contents.add("NULL");
@@ -160,6 +172,7 @@ public class ReadRows {
                                     long val = tableFile.readLong();
                                     rsr.contents.add(DataType.dataAsString(7,val));
                                 }
+                                break;
                             case 8://DATE
                                 if(isnull.get(col)){
                                     rsr.contents.add("NULL");
@@ -168,6 +181,7 @@ public class ReadRows {
                                     long val = tableFile.readLong();
                                     rsr.contents.add(DataType.dataAsString(8,val));
                                 }
+                                break;
                             case 9://TEXT
                                 if(isnull.get(col)){
                                     rsr.contents.add("NULL");
@@ -177,6 +191,7 @@ public class ReadRows {
                                     tableFile.read(textBuffer);
                                     rsr.contents.add(new String(textBuffer));
                                 }
+                                break;
                         }
                     }
                     
@@ -185,7 +200,7 @@ public class ReadRows {
                 }
                 curPage = nextPage;
             }
-        }catch(InvalidTableInformationException | IOException e){throw new FileAccessException();
+        }catch(InvalidTableInformationException | IOException e){e.printStackTrace();throw new FileAccessException();
         }catch(MissingTableFileException e){throw e;}
         return rs;
     }
@@ -213,7 +228,12 @@ public class ReadRows {
             else;
         
             String workingDirectory = System.getProperty("user.dir"); // gets current working directory
-            String absoluteFilePath = workingDirectory + File.separator + "data" + File.separator + "user_data" + File.separator + tableName+".tbl";
+            String subfolder;
+            if(tableName.equals("davisbase_tables")||tableName.equals("davisbase_columns"))
+                subfolder = "catalog";
+            else
+                subfolder = "user_data";
+            String absoluteFilePath = workingDirectory + File.separator + "data" + File.separator + subfolder + File.separator + tableName+".tbl";
             File file = new File(absoluteFilePath);
             if (!(file.exists() && !file.isDirectory())){
                 throw new MissingTableFileException(tableName);
@@ -269,7 +289,8 @@ public class ReadRows {
                     tableFile.skipBytes(1);//skip over number of columns
                     ArrayList<Boolean> isnull = new ArrayList<>();
                     HashMap<Integer,Integer> textFieldLength = new HashMap<>();
-                    for(int col=0;col<schema.numCols;++col){
+                    isnull.add(false);
+                    for(int col=1;col<schema.numCols;++col){
                         int serialTypeCode = tableFile.readByte();
                         if (serialTypeCode<4)
                             isnull.add(true);
@@ -287,7 +308,8 @@ public class ReadRows {
                     
                     //read record data
                     ResultSetRow rsr = new ResultSetRow();
-                    for(int col=0;useThisRecord && col<schema.numCols;++col){
+                    rsr.contents.add(DataType.dataAsString(3,row_id));
+                    for(int col=1;useThisRecord && col<schema.numCols;++col){
                         switch(schema.colDataTypes.get(col).getDataTypeAsInt()){
                             case 1://TINYINT
                                 if(isnull.get(col)){
@@ -312,6 +334,7 @@ public class ReadRows {
                                         useThisRecord = false;
                                     else;
                                 }
+                                break;
                             case 3://INT
                                 if(isnull.get(col)){
                                     rsr.contents.add("NULL");
@@ -323,6 +346,7 @@ public class ReadRows {
                                         useThisRecord = false;
                                     else;
                                 }
+                                break;
                             case 4://BIGINT
                                 if(isnull.get(col)){
                                     rsr.contents.add("NULL");
@@ -334,6 +358,7 @@ public class ReadRows {
                                         useThisRecord = false;
                                     else;
                                 }
+                                break;
                             case 5://REAL
                                 if(isnull.get(col)){
                                     rsr.contents.add("NULL");
@@ -345,6 +370,7 @@ public class ReadRows {
                                         useThisRecord = false;
                                     else;
                                 }
+                                break;
                             case 6://DOUBLE
                                 if(isnull.get(col)){
                                     rsr.contents.add("NULL");
@@ -356,6 +382,7 @@ public class ReadRows {
                                         useThisRecord = false;
                                     else;
                                 }
+                                break;
                             case 7://DATETIME
                                 if(isnull.get(col)){
                                     rsr.contents.add("NULL");
@@ -367,6 +394,7 @@ public class ReadRows {
                                         useThisRecord = false;
                                     else;
                                 }
+                                break;
                             case 8://DATE
                                 if(isnull.get(col)){
                                     rsr.contents.add("NULL");
@@ -378,6 +406,7 @@ public class ReadRows {
                                         useThisRecord = false;
                                     else;
                                 }
+                                break;
                             case 9://TEXT
                                 if(isnull.get(col)){
                                     rsr.contents.add("NULL");
@@ -391,6 +420,7 @@ public class ReadRows {
                                         useThisRecord = false;
                                     else;
                                 }
+                                break;
                         }
                     }
                     
@@ -428,7 +458,12 @@ public class ReadRows {
             else;
         
             String workingDirectory = System.getProperty("user.dir"); // gets current working directory
-            String absoluteFilePath = workingDirectory + File.separator + "data" + File.separator + "user_data" + File.separator + tableName+".tbl";
+            String subfolder;
+            if(tableName.equals("davisbase_tables")||tableName.equals("davisbase_columns"))
+                subfolder = "catalog";
+            else
+                subfolder = "user_data";
+            String absoluteFilePath = workingDirectory + File.separator + "data" + File.separator + subfolder + File.separator + tableName+".tbl";
             File file = new File(absoluteFilePath);
             if (!(file.exists() && !file.isDirectory())){
                 throw new MissingTableFileException(tableName);
@@ -459,7 +494,8 @@ public class ReadRows {
                     tableFile.skipBytes(1);//skip over number of columns
                     ArrayList<Boolean> isnull = new ArrayList<>();
                     HashMap<Integer,Integer> textFieldLength = new HashMap<>();
-                    for(int col=0;col<schema.numCols;++col){
+                    isnull.add(false);//row_id
+                    for(int col=1;col<schema.numCols;++col){
                         int serialTypeCode = tableFile.readByte();
                         if (serialTypeCode<4)
                             isnull.add(true);
@@ -477,7 +513,8 @@ public class ReadRows {
                     
                     //read record data
                     ResultSetRow rsr = new ResultSetRow();
-                    for(int col=0;col<schema.numCols;++col){
+                    rsr.contents.add(DataType.dataAsString(3,row_id));
+                    for(int col=1;col<schema.numCols;++col){
                         switch(schema.colDataTypes.get(col).getDataTypeAsInt()){
                             case 1://TINYINT
                                 if(isnull.get(col)){
@@ -496,6 +533,7 @@ public class ReadRows {
                                     int val = tableFile.readShort();
                                     rsr.contents.add(DataType.dataAsString(2,val));
                                 }
+                                break;
                             case 3://INT
                                 if(isnull.get(col)){
                                     rsr.contents.add("NULL");
@@ -504,6 +542,7 @@ public class ReadRows {
                                     int val = tableFile.readInt();
                                     rsr.contents.add(DataType.dataAsString(3,val));
                                 }
+                                break;
                             case 4://BIGINT
                                 if(isnull.get(col)){
                                     rsr.contents.add("NULL");
@@ -512,6 +551,7 @@ public class ReadRows {
                                     long val = tableFile.readLong();
                                     rsr.contents.add(DataType.dataAsString(4,val));
                                 }
+                                break;
                             case 5://REAL
                                 if(isnull.get(col)){
                                     rsr.contents.add("NULL");
@@ -520,6 +560,7 @@ public class ReadRows {
                                     float val = tableFile.readFloat();
                                     rsr.contents.add(DataType.dataAsString(5,val));
                                 }
+                                break;
                             case 6://DOUBLE
                                 if(isnull.get(col)){
                                     rsr.contents.add("NULL");
@@ -528,6 +569,7 @@ public class ReadRows {
                                     double val = tableFile.readDouble();
                                     rsr.contents.add(DataType.dataAsString(6,val));
                                 }
+                                break;
                             case 7://DATETIME
                                 if(isnull.get(col)){
                                     rsr.contents.add("NULL");
@@ -536,6 +578,7 @@ public class ReadRows {
                                     long val = tableFile.readLong();
                                     rsr.contents.add(DataType.dataAsString(7,val));
                                 }
+                                break;
                             case 8://DATE
                                 if(isnull.get(col)){
                                     rsr.contents.add("NULL");
@@ -544,6 +587,7 @@ public class ReadRows {
                                     long val = tableFile.readLong();
                                     rsr.contents.add(DataType.dataAsString(8,val));
                                 }
+                                break;
                             case 9://TEXT
                                 if(isnull.get(col)){
                                     rsr.contents.add("NULL");
@@ -554,6 +598,7 @@ public class ReadRows {
                                     String val = new String(textBuffer);
                                     rsr.contents.add(val);
                                 }
+                                break;
                         }
                     }
                     
@@ -645,8 +690,11 @@ public class ReadRows {
      */
     public static TableColumnInfo getTableColumnInfoFromMetadata(String tableName) throws MissingTableFileException, FileNotFoundException, IOException, InvalidTableInformationException{
         TableColumnInfo tci = new TableColumnInfo();
+        tci.colNames = new ArrayList<>();
+        tci.colDataTypes = new ArrayList<>();
+        tci.colNullable = new ArrayList<>();
         String workingDirectory = System.getProperty("user.dir"); // gets current working directory
-	String absoluteFilePath = workingDirectory + File.separator + "data" + File.separator + "catalog" + File.separator + "davisbase_tables.tbl";
+	String absoluteFilePath = workingDirectory + File.separator + "data" + File.separator + "catalog" + File.separator + "davisbase_columns.tbl";
 	File file = new File(absoluteFilePath);
         if (!(file.exists() && !file.isDirectory())){
             System.out.println("Table Metadata Information has been deleted. Cannot guarantee proper execution.");
@@ -661,6 +709,10 @@ public class ReadRows {
         /*
             Go through all leaf pages and get all info about the table
         */
+        ArrayList<String> colNames = new ArrayList<>();
+        ArrayList<DataType> colDataTypes = new ArrayList<>();
+        ArrayList<Boolean> colNullable = new ArrayList<>();
+        ArrayList<Short> ordinalPos = new ArrayList<>();
         int curPage = 1;
         while(curPage != -1){
             long pageStart = (curPage-1)*DavisBase.PAGESIZE;
@@ -704,22 +756,28 @@ public class ReadRows {
                 catalogTableColumnFile.read(dataTypeByteBuffer);
                 String dataType = new String(dataTypeByteBuffer);
                 //read ordinal position
-                int ordinal_pos = catalogTableColumnFile.readShort();
+                short ordinal_pos = catalogTableColumnFile.readByte();
                 //skip over nullability - can be decided based on length of string
                 catalogTableColumnFile.skipBytes(nullableLen);
                 
                 //add data to return object
-                tci.colNames.add(ordinal_pos,colName);
-                tci.colDataTypes.add(ordinal_pos,new DataType(dataType));
+                colNames.add(colName);
+                colDataTypes.add(new DataType(dataType));
                 if(nullableLen==3)
-                    tci.colNullable.add(ordinal_pos,true);
+                    colNullable.add(true);
                 else
-                    tci.colNullable.add(ordinal_pos,false);
+                    colNullable.add(false);
+                ordinalPos.add(ordinal_pos);
             }
             
             curPage = nextPage;
         }
-        
+        for(int i=1;i<=ordinalPos.size();++i){
+            int pos = ordinalPos.indexOf((short)i);
+            tci.colNames.add(colNames.get(pos));
+            tci.colDataTypes.add(colDataTypes.get(pos));
+            tci.colNullable.add(colNullable.get(pos));
+        }
         tci.numCols = tci.colNames.size();
         return tci;
     }

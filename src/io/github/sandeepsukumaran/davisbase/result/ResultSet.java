@@ -24,7 +24,7 @@ import java.util.ArrayList;
  */
 public class ResultSet {
     public ResultSet(){
-        
+        data = new ArrayList<>();
     }
     
     public ArrayList<ResultSetRow> getData(){return data;}

@@ -31,6 +31,8 @@ import java.nio.file.Paths;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 /**
  *
  * @author Sandeep
@@ -61,8 +63,15 @@ public class DavisBase {
             }else if(!Files.isWritable(dataFolderPath)){
                 System.out.println("WARNING: User does not have write permission in this location. Read only mode.");
                 return -1;
-            }else
+            }else{
+                try {
+                    populateTableNames();
+                } catch (InvalidTableInformationException | IOException | MissingTableFileException e) {
+                    System.out.println("ERROR : Unable to read information about file structures. Terminating...");
+                    return -1;
+                }
                 return 0;
+            }
         }else if(!Files.isWritable(Paths.get(workingDirectory))){
             System.out.println("ERROR : Unable to setup file structures. Terminating...");
             return -1;

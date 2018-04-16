@@ -75,7 +75,7 @@ public class selectQueryHandler {
     
     private void selectAllQueryExecute() throws NoSuchTableException, NoSuchColumnException, FileAccessException, MissingTableFileException, InvalidDataType, IOException, FileNotFoundException, InvalidTableInformationException{
         ArrayList<String> tableNames = DavisBase.getTableNames();
-        String tableName = selectAllMatcher.group("tablename");
+        String tableName = selectAllMatcher.group("tablename"); System.out.println(tableName);
         if (!tableNames.contains(tableName))
             throw new NoSuchTableException(tableName);
         else;

@@ -19,7 +19,6 @@ package io.github.sandeepsukumaran.davisbase.display;
 import io.github.sandeepsukumaran.davisbase.result.ResultSet;
 import io.github.sandeepsukumaran.davisbase.result.ResultSetRow;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  *
@@ -61,7 +60,7 @@ public class Display {
         //print separator line of +,- 's
         for(int i=0;i<numCols;++i){
             System.out.print("+");
-            for(int j=0;j<colwidths.get(j);++j)
+            for(int j=0;j<colwidths.get(i);++j)
                 System.out.print("-");
         }
         System.out.println("+");
@@ -76,7 +75,7 @@ public class Display {
         //print separator line of +,- 's
         for(int i=0;i<numCols;++i){
             System.out.print("+");
-            for(int j=0;j<colwidths.get(j);++j)
+            for(int j=0;j<colwidths.get(i);++j)
                 System.out.print("-");
         }
         System.out.println("+");
@@ -93,7 +92,7 @@ public class Display {
         //print separator line of +,- 's
         for(int i=0;i<numCols;++i){
             System.out.print("+");
-            for(int j=0;j<colwidths.get(j);++j)
+            for(int j=0;j<colwidths.get(i);++j)
                 System.out.print("-");
         }
         System.out.println("+");
