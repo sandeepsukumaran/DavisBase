@@ -86,21 +86,27 @@ public class selectQueryHandler {
             Display.displayResults(tablecols,ReadRows.readRows(tableName));
         }else{
             //where condition exists
-            whereclause = whereclause.substring(5).trim();
+            whereclause = whereclause.trim().substring(5).trim();
             int pos = whereclause.indexOf('=');
             if (pos != -1){
                 //comparison operator used in query
                 String colName;
                 if ((whereclause.charAt(pos-1)!='>') && (whereclause.charAt(pos-1)!='<')){
                     colName = whereclause.substring(0,pos).trim();
-                    Display.displayResults(tablecols,ReadRows.readRows(tableName,colName,"=",whereclause.substring(pos+1,whereclause.length()-1)));
+                    Display.displayResults(tablecols,ReadRows.readRows(tableName,colName,"=",whereclause.substring(pos+1,whereclause.length())));
                 }else{
                     colName = whereclause.substring(0,pos-1).trim(); //pos is location of =
-                    Display.displayResults(tablecols,ReadRows.readRows(tableName,colName,whereclause.substring(pos-1,pos+1),whereclause.substring(pos+1,whereclause.length()-1)));
+                    Display.displayResults(tablecols,ReadRows.readRows(tableName,colName,whereclause.substring(pos-1,pos+1),whereclause.substring(pos+1,whereclause.length())));
                 }
             }else if(whereclause.contains("<>")){
                 String colName = whereclause.substring(0,whereclause.indexOf("<>")).trim();
-                Display.displayResults(tablecols,ReadRows.readRows(tableName,colName,"<>",whereclause.substring(whereclause.indexOf("<>")+2,whereclause.length()-1)));
+                Display.displayResults(tablecols,ReadRows.readRows(tableName,colName,"<>",whereclause.substring(whereclause.indexOf("<>")+2,whereclause.length())));
+            }else if(whereclause.contains("<")){
+                String colName = whereclause.substring(0,whereclause.indexOf("<")).trim();
+                Display.displayResults(tablecols,ReadRows.readRows(tableName,colName,"<",whereclause.substring(whereclause.indexOf("<")+1,whereclause.length())));
+            }else if(whereclause.contains(">")){
+                String colName = whereclause.substring(0,whereclause.indexOf(">")).trim();
+                Display.displayResults(tablecols,ReadRows.readRows(tableName,colName,">",whereclause.substring(whereclause.indexOf(">")+1,whereclause.length())));
             }else if(whereclause.contains("is null")){
                 String colName = whereclause.substring(0,whereclause.indexOf("is null")).trim();
                 Display.displayResults(tablecols,ReadRows.readRows(tableName,colName,true));
@@ -133,23 +139,31 @@ public class selectQueryHandler {
             Display.displayResults(selectcols,rs.projectColumns(selectcols,tablecols));
         }else{
             //where condition exists
-            whereclause = whereclause.substring(5).trim();
+            whereclause = whereclause.trim().substring(5).trim();
             int pos = whereclause.indexOf('=');
             if (pos != -1){
                 //comparison operator used in query
                 String colName;
                 if ((whereclause.charAt(pos-1)!='>') && (whereclause.charAt(pos-1)!='<')){
                     colName = whereclause.substring(0,pos).trim();
-                    ResultSet rs = ReadRows.readRows(tableName,colName,"=",whereclause.substring(pos+1,whereclause.length()-1));
+                    ResultSet rs = ReadRows.readRows(tableName,colName,"=",whereclause.substring(pos+1,whereclause.length()));
                     Display.displayResults(selectcols,rs.projectColumns(selectcols,tablecols));
                 }else{
                     colName = whereclause.substring(0,pos-1).trim(); //pos is location of =
-                    ResultSet rs = ReadRows.readRows(tableName,colName,whereclause.substring(pos-1,pos+1),whereclause.substring(pos+1,whereclause.length()-1));
+                    ResultSet rs = ReadRows.readRows(tableName,colName,whereclause.substring(pos-1,pos+1),whereclause.substring(pos+1,whereclause.length()));
                     Display.displayResults(selectcols,rs.projectColumns(selectcols,tablecols));
                 }
             }else if(whereclause.contains("<>")){
                 String colName = whereclause.substring(0,whereclause.indexOf("<>")).trim();
-                ResultSet rs = ReadRows.readRows(tableName,colName,"<>",whereclause.substring(whereclause.indexOf("<>")+2,whereclause.length()-1));
+                ResultSet rs = ReadRows.readRows(tableName,colName,"<>",whereclause.substring(whereclause.indexOf("<>")+2,whereclause.length()));
+                Display.displayResults(selectcols,rs.projectColumns(selectcols,tablecols));
+            }else if(whereclause.contains("<")){
+                String colName = whereclause.substring(0,whereclause.indexOf("<")).trim();
+                ResultSet rs = ReadRows.readRows(tableName,colName,"<",whereclause.substring(whereclause.indexOf("<")+1,whereclause.length()));
+                Display.displayResults(selectcols,rs.projectColumns(selectcols,tablecols));
+            }else if(whereclause.contains(">")){
+                String colName = whereclause.substring(0,whereclause.indexOf(">")).trim();
+                ResultSet rs = ReadRows.readRows(tableName,colName,">",whereclause.substring(whereclause.indexOf(">")+1,whereclause.length()));
                 Display.displayResults(selectcols,rs.projectColumns(selectcols,tablecols));
             }else if(whereclause.contains("is null")){
                 String colName = whereclause.substring(0,whereclause.indexOf("is null")).trim();
@@ -168,6 +182,6 @@ public class selectQueryHandler {
     private final Matcher selectAllMatcher;
     private final Matcher selectMatcher;
     private final String query;
-    private final String SELECT_ALL_QUERY = "^select \\* from (?<tablename>\\w+)(?<whereclause>where\\p{javaWhitespace}+\\w+(\\p{javaWhitespace}*(=|<=|<|>|>=|<>)\\p{javaWhitespace}*((\\d+(\\.\\d+)?)|\"([\\p{Graph}&&[^\"\']])+\"))|(\\p{javaWhitespace}+is null)|(\\p{javaWhitespace}+is not null))?$";
-    private static final String SELECT_QUERY = "^select (?<columnnames>\\w+(\\p{javaWhitespace}?,\\p{javaWhitespace}?\\w+)*) from (<?tablename>\\w+)(?<whereclause>where\\p{javaWhitespace}+\\w+(\\p{javaWhitespace}*(=|<=|<|>|>=|<>)\\p{javaWhitespace}*((\\d+(\\.\\d+)?)|\"([\\p{Graph}&&[^\"\']])+\"))|(\\p{javaWhitespace}+is null)|(\\p{javaWhitespace}+is not null))?$";
+    private final String SELECT_ALL_QUERY = "^select \\* from (?<tablename>\\w+)(?<whereclause>\\p{javaWhitespace}+where\\p{javaWhitespace}+\\w+(\\p{javaWhitespace}*(=|<=|<|>|>=|<>)\\p{javaWhitespace}*((\\d+(\\.\\d+)?)|\"([\\p{Graph}&&[^\"\']])+\"))|(\\p{javaWhitespace}+is null)|(\\p{javaWhitespace}+is not null))?$";
+    private static final String SELECT_QUERY = "^select (?<columnnames>\\w+(\\p{javaWhitespace}?,\\p{javaWhitespace}?\\w+)*) from (<?tablename>\\w+)(?<whereclause>\\p{javaWhitespace}+where\\p{javaWhitespace}+\\w+(\\p{javaWhitespace}*(=|<=|<|>|>=|<>)\\p{javaWhitespace}*((\\d+(\\.\\d+)?)|\"([\\p{Graph}&&[^\"\']])+\"))|(\\p{javaWhitespace}+is null)|(\\p{javaWhitespace}+is not null))?$";
 }

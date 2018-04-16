@@ -200,7 +200,7 @@ public class ReadRows {
                 }
                 curPage = nextPage;
             }
-        }catch(InvalidTableInformationException | IOException e){e.printStackTrace();throw new FileAccessException();
+        }catch(InvalidTableInformationException | IOException e){throw new FileAccessException();
         }catch(MissingTableFileException e){throw e;}
         return rs;
     }
@@ -316,7 +316,7 @@ public class ReadRows {
                                     rsr.contents.add("NULL");
                                     tableFile.skipBytes(1);
                                 }else{
-                                    int val = tableFile.readByte();
+                                    byte val = tableFile.readByte();
                                     rsr.contents.add(DataType.dataAsString(1,val));
                                     if((col==colNum)&&(!evaluate("tinyint",val,targetValue,operator)))
                                         useThisRecord = false;
@@ -328,7 +328,7 @@ public class ReadRows {
                                     rsr.contents.add("NULL");
                                     tableFile.skipBytes(2);
                                 }else{
-                                    int val = tableFile.readShort();
+                                    short val = tableFile.readShort();
                                     rsr.contents.add(DataType.dataAsString(2,val));
                                     if((col==colNum)&&(!evaluate("smallint",val,targetValue,operator)))
                                         useThisRecord = false;
@@ -433,7 +433,7 @@ public class ReadRows {
             }
         }catch(InvalidTableInformationException | IOException e){throw new FileAccessException();
         }catch(MissingTableFileException e){throw e;
-        }catch(NumberFormatException e){throw new InvalidDataType(tarValue);}
+        }catch(NumberFormatException e){e.printStackTrace();throw new InvalidDataType(tarValue);}
         return rs;
     }
     
@@ -785,9 +785,20 @@ public class ReadRows {
     private static boolean evaluate(String dtype, Object curVal,Object tarVal,String op){
         switch(DataType.getDataTypeAsInt(dtype)){
             case 1://tinyint
+                byte bcurval = (byte)curVal;
+                byte btarval = (byte)tarVal;
+                switch(op){
+                    case "<": return bcurval<btarval;
+                    case "<=": return bcurval<=btarval;
+                    case ">": return bcurval>btarval;
+                    case ">=": return bcurval>=btarval;
+                    case "=": return bcurval==btarval;
+                    case "<>": return bcurval!=btarval;
+                }
+                break;
             case 2://smallint
-                short scurval = (Short)curVal;
-                short starval = (Short)tarVal;
+                short scurval = (short)curVal;
+                short starval = (short)tarVal;
                 switch(op){
                     case "<": return scurval<starval;
                     case "<=": return scurval<=starval;
@@ -798,8 +809,8 @@ public class ReadRows {
                 }
                 break;
             case 3://int
-                int icurval = (Integer)curVal;
-                int itarval = (Integer)tarVal;
+                int icurval = (int)curVal;
+                int itarval = (int)tarVal;
                 switch(op){
                     case "<": return icurval<itarval;
                     case "<=": return icurval<=itarval;
@@ -810,8 +821,8 @@ public class ReadRows {
                 }
                 break;
             case 4://bigint
-                long lcurval = (Long)curVal;
-                long ltarval = (Long)tarVal;
+                long lcurval = (long)curVal;
+                long ltarval = (long)tarVal;
                 switch(op){
                     case "<": return lcurval<ltarval;
                     case "<=": return lcurval<=ltarval;
@@ -822,8 +833,8 @@ public class ReadRows {
                 }
                 break;
             case 5://real
-                float fcurval = (Float)curVal;
-                float ftarval = (Float)tarVal;
+                float fcurval = (float)curVal;
+                float ftarval = (float)tarVal;
                 switch(op){
                     case "<": return fcurval<ftarval;
                     case "<=": return fcurval<=ftarval;
@@ -834,8 +845,8 @@ public class ReadRows {
                 }
                 break;
             case 6://double
-                double dcurval = (Double)curVal;
-                double dtarval = (Double)tarVal;
+                double dcurval = (double)curVal;
+                double dtarval = (double)tarVal;
                 switch(op){
                     case "<": return dcurval<dtarval;
                     case "<=": return dcurval<=dtarval;
@@ -846,8 +857,8 @@ public class ReadRows {
                 }
                 break;
             case 7://datetime
-                long dttcurval = (Long)curVal;
-                long dtttarval = (Long)tarVal;
+                long dttcurval = (long)curVal;
+                long dtttarval = (long)tarVal;
                 switch(op){
                     case "<": return dttcurval<dtttarval;
                     case "<=": return dttcurval<=dtttarval;
@@ -858,8 +869,8 @@ public class ReadRows {
                 }
                 break;
             case 8://date
-                long dtcurval = (Long)curVal;
-                long dttarval = (Long)tarVal;
+                long dtcurval = (long)curVal;
+                long dttarval = (long)tarVal;
                 switch(op){
                     case "<": return dtcurval<dttarval;
                     case "<=": return dtcurval<=dttarval;
