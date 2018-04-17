@@ -162,8 +162,8 @@ public class insertQueryHandler {
             throw new NoDirectMetaDataModificationException();
         else{}
         TableColumnInfo tabcolinfo = DavisBase.getTableInfo(tableName);
-        String cols = insertAllMatcher.group("colnames");
-        String values = insertAllMatcher.group("values");
+        String cols = insertMatcher.group("colnames");
+        String values = insertMatcher.group("values");
         cols = cols.substring(1, cols.length()-1);//ignore first and last ( and )
         ArrayList<String>colnames = new ArrayList<>(Arrays.asList(cols.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1)));
         colnames = HelperMethods.uniqueStringArrayList(colnames);
@@ -205,7 +205,7 @@ public class insertQueryHandler {
                     }else//column cannot be null
                         throw new ColumnCannotBeNullException(tci.colNames.get(col));
                 else//value has been given for inserting
-                    isnull.add(false);
+                    //isnull.add(false);
                 switch(tci.colDataTypes.get(col).getDataTypeAsInt()){
                     case 1:
                         if(tokens[inputindex].equals("null")){
@@ -268,7 +268,7 @@ public class insertQueryHandler {
                             isnull.add(true);colData.add(0x00);
                         }else{
                             isnull.add(false);
-                            colData.add(tokens[inputindex]);
+                            colData.add(tokens[inputindex].substring(1,tokens[inputindex].length()-1));
                         }break;
                 }
             }
