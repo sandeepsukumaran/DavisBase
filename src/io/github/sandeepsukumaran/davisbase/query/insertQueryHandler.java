@@ -75,7 +75,7 @@ public class insertQueryHandler {
             throw new InvalidQuerySyntaxException();
     }
     
-    private void insertAllQueryExecute() throws NoSuchTableException, ArgumentCountMismatchException, BadInputValueException, InvalidTableInformationException, IOException, MissingTableFileException{
+    private void insertAllQueryExecute() throws NoSuchTableException, ArgumentCountMismatchException, BadInputValueException, InvalidTableInformationException, IOException, MissingTableFileException, NoSuchColumnException, ColumnCannotBeNullException{
         ArrayList<String> tableNames = DavisBase.getTableNames();
         String tableName = insertAllMatcher.group("tablename");
         if (!tableNames.contains(tableName))
@@ -83,17 +83,21 @@ public class insertQueryHandler {
         else;
         TableColumnInfo tabcolinfo = DavisBase.getTableInfo(tableName);
         String values = insertAllMatcher.group("values");
-        ArrayList<Object> colData = parseValues(tabcolinfo,values);
+        ParseResult parseres = parseValues(tabcolinfo,tabcolinfo.colNames,values);
+        //ArrayList<Object> colData = parseValues(tabcolinfo,values);
         
         //only TEXT fields maybe null indicated by ""
-        ArrayList<Boolean>isnull = new ArrayList<>();
+        /*ArrayList<Boolean>isnull = new ArrayList<>();
         for(int i=0;i<tabcolinfo.numCols;++i)
             if(tabcolinfo.colDataTypes.get(i).getDataTypeAsInt()!=9)
                 isnull.add(false);
             else if(((String)colData.get(i)).equals(""))
                 isnull.add(true);
-        byte[] record = buildRecord(colData,tabcolinfo,isnull);
-        int rowid = (Integer)colData.get(0);
+        */
+        //byte[] record = buildRecord(colData,tabcolinfo,isnull);
+        byte[] record = buildRecord(parseres.getColData(),tabcolinfo,parseres.getIsNull());
+        //int rowid = (Integer)colData.get(0);
+        int rowid = (Integer)parseres.getColData().get(0);
         try{
             InsertRecord.writeRecordToFile(tableName,record,rowid);
         }catch(MissingTableFileException|FileNotFoundException e){throw new NoSuchTableException(tableName);}
@@ -198,32 +202,68 @@ public class insertQueryHandler {
                     isnull.add(false);
                 switch(tci.colDataTypes.get(col).getDataTypeAsInt()){
                     case 1:
-                        colData.add(Byte.parseByte(tokens[inputindex]));
-                        break;
+                        if(tokens[inputindex].equals("null")){
+                            isnull.add(true);colData.add(0x00);
+                        }else{
+                            isnull.add(false);
+                            colData.add(Byte.parseByte(tokens[inputindex]));
+                        }break;
                     case 2:
-                        colData.add(Short.parseShort(tokens[inputindex]));
-                        break;
+                        if(tokens[inputindex].equals("null")){
+                            isnull.add(true);colData.add(0x00);
+                        }else{
+                            isnull.add(false);
+                            colData.add(Short.parseShort(tokens[inputindex]));
+                        }break;
                     case 3:
-                        colData.add(Integer.parseInt(tokens[inputindex]));
-                        break;
+                        if(tokens[inputindex].equals("null")){
+                            isnull.add(true);colData.add(0x00);
+                        }else{
+                            isnull.add(false);
+                            colData.add(Integer.parseInt(tokens[inputindex]));
+                        }break;
                     case 4:
-                        colData.add(Long.parseLong(tokens[inputindex]));
-                        break;
+                        if(tokens[inputindex].equals("null")){
+                            isnull.add(true);colData.add(0x00);
+                        }else{
+                            isnull.add(false);
+                            colData.add(Long.parseLong(tokens[inputindex]));
+                        }break;
                     case 5:
-                        colData.add(Float.parseFloat(tokens[inputindex]));
-                        break;
+                        if(tokens[inputindex].equals("null")){
+                            isnull.add(true);colData.add(0x00);
+                        }else{
+                            isnull.add(false);
+                            colData.add(Float.parseFloat(tokens[inputindex]));
+                        }break;
                     case 6:
-                        colData.add(Double.parseDouble(tokens[inputindex]));
-                        break;
+                        if(tokens[inputindex].equals("null")){
+                            isnull.add(true);colData.add(0x00);
+                        }else{
+                            isnull.add(false);
+                            colData.add(Double.parseDouble(tokens[inputindex]));
+                        }break;
                     case 7:
-                        colData.add(simpleDateTimeFormat.parse(tokens[inputindex]).getTime());
-                        break;
+                        if(tokens[inputindex].equals("null")){
+                            isnull.add(true);colData.add(0x00);
+                        }else{
+                            isnull.add(false);
+                            colData.add(simpleDateTimeFormat.parse(tokens[inputindex]).getTime());
+                        }break;
                     case 8:
-                        colData.add(simpleDateFormat.parse(tokens[inputindex]).getTime());
-                        break;
+                        if(tokens[inputindex].equals("null")){
+                            isnull.add(true);colData.add(0x00);
+                        }else{
+                            isnull.add(false);
+                            colData.add(simpleDateFormat.parse(tokens[inputindex]).getTime());
+                        }break;
                     case 9:
-                        colData.add(tokens[inputindex]);
-                        break;
+                        if(tokens[inputindex].equals("null")){
+                            isnull.add(true);colData.add(0x00);
+                        }else{
+                            isnull.add(false);
+                            colData.add(tokens[inputindex]);
+                        }break;
                 }
             }
         }catch(NumberFormatException|ParseException e){throw new BadInputValueException();}
