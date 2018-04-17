@@ -83,7 +83,7 @@ public class queryParser {
         if (inputCommand.matches(SELECT_QUERY))
             new selectQueryHandler(inputCommand).execute();
         else if (inputCommand.matches(INSERT_QUERY))
-            System.out.println("Insert query");//new insertQueryHandler(inputCommand).execute();
+            new insertQueryHandler(inputCommand).execute();
         else if(inputCommand.matches(UPDATE_QUERY))
             System.out.println("Update query");//new updateQueryHandler(inputCommand).execute();
         else if(inputCommand.matches(CREATE_QUERY))
@@ -150,7 +150,8 @@ public class queryParser {
     
     //regex for valid commands
     static final String SELECT_QUERY = "select ((\\*)|(\\w+(\\p{javaWhitespace}?,\\p{javaWhitespace}?\\w+)*)) from (\\w+)(\\p{javaWhitespace}+where\\p{javaWhitespace}+\\w+((\\p{javaWhitespace}*(=|<=|<|>|>=|<>)\\p{javaWhitespace}*((\\d+(\\.\\d+)?)|(\"([\\p{Graph}&&[^\"\']])+\")))|(\\p{javaWhitespace}+is null)|(\\p{javaWhitespace}+is not null)))?";
-    static final String INSERT_QUERY = "insert into \\w+\\p{javaWhitespace}*(\\(\\w+(\\p{javaWhitespace}*,\\p{javaWhitespace}*\\w+)*\\))?\\p{javaWhitespace}*values\\p{javaWhitespace}*\\(((\\d+(\\.\\d+)?)|(\"([\\p{Graph}&&[^\"\']])+\"))(\\p{javaWhitespace}*,\\p{javaWhitespace}*((\\d+(\\.\\d+)?)|\"([\\p{Graph}&&[^\"\']])+\"))*\\)";
+    static final String INSERT_QUERY1 = "insert into \\w+\\p{javaWhitespace}*(\\(\\w+(\\p{javaWhitespace}*,\\p{javaWhitespace}*\\w+)*\\))?\\p{javaWhitespace}*values\\p{javaWhitespace}*\\(((\\d+(\\.\\d+)?)|(\"([\\p{Graph}&&[^\"\']])+\"))(\\p{javaWhitespace}*,\\p{javaWhitespace}*((\\d+(\\.\\d+)?)|\"([\\p{Graph}&&[^\"\']])+\"))*\\)";
+    static final String INSERT_QUERY = "insert into \\w+\\p{javaWhitespace}*(\\(\\w+(\\p{javaWhitespace}*,\\p{javaWhitespace}*\\w+)*\\))?\\p{javaWhitespace}*values\\p{javaWhitespace}*(\\(((\\d+(\\.\\d+)?)|(\"([\\p{Graph}&&[^\"\']])+\")|(null))(\\p{javaWhitespace}*,\\p{javaWhitespace}*((\\d+(\\.\\d+)?)|(\"([\\p{Graph}&&[^\"\']])+\")|(null)))*\\))";
     static final String UPDATE_QUERY = "update \\w+ set \\w+\\p{javaWhitespace}*=\\p{javaWhitespace}*(\\d+(\\.\\d+)?)|(\"([\\p{Graph}&&[^\"\']])+\") \\p{javaWhitespace}*(where \\w+(\\p{javaWhitespace}*=\\p{javaWhitespace}*((\\d+(\\.\\d+)?)|(\"([\\p{Graph}&&[^\"\']])+\")))|(\\p{javaWhitespace}+is null)|((\\p{javaWhitespace}+is not null)))?";
     static final String CREATE_QUERY = "create\\p{javaWhitespace}+table\\p{javaWhitespace}+(\\p{Alpha}\\w*)\\p{javaWhitespace}*\\(((\\p{javaWhitespace}*\\p{Alpha}\\w*\\p{javaWhitespace}+\\p{Alpha}+\\p{javaWhitespace}*(\\p{javaWhitespace}+((primary\\p{javaWhitespace}+key)|(not\\p{javaWhitespace}+null)))?\\p{javaWhitespace}*,)*(\\p{javaWhitespace}*\\p{Alpha}\\w*\\p{javaWhitespace}+\\p{Alpha}+\\p{javaWhitespace}*(\\p{javaWhitespace}+((primary\\p{javaWhitespace}+key)|(not\\p{javaWhitespace}+null)))?\\p{javaWhitespace}*))\\)";
     static final String DROP_QUERY = "drop\\p{javaWhitespace}+table\\p{javaWhitespace}+(\\p{Alpha}\\w*)";
