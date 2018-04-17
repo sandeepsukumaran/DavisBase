@@ -29,6 +29,7 @@ import io.github.sandeepsukumaran.davisbase.exception.InvalidTableInformationExc
 import io.github.sandeepsukumaran.davisbase.exception.MissingTableFileException;
 import io.github.sandeepsukumaran.davisbase.main.DavisBase;
 import io.github.sandeepsukumaran.davisbase.exception.NoDatabaseSelectedException;
+import io.github.sandeepsukumaran.davisbase.exception.NoDirectMetaDataModificationException;
 import io.github.sandeepsukumaran.davisbase.exception.NoPKException;
 import io.github.sandeepsukumaran.davisbase.exception.NoSuchColumnException;
 import io.github.sandeepsukumaran.davisbase.exception.NoSuchTableException;
@@ -63,8 +64,9 @@ public class queryParser {
      * @throws io.github.sandeepsukumaran.davisbase.exception.InvalidPKException
      * @throws java.io.FileNotFoundException
      * @throws io.github.sandeepsukumaran.davisbase.exception.NoPKException
+     * @throws io.github.sandeepsukumaran.davisbase.exception.NoDirectMetaDataModificationException
      */
-    public static void parseInputCommand(String inputCommand) throws NoDatabaseSelectedException,InvalidQuerySyntaxException,NoSuchTableException,NoSuchColumnException, FileAccessException, MissingTableFileException, InvalidDataType, ArgumentCountMismatchException, BadInputValueException, InvalidTableInformationException, IOException, ColumnCannotBeNullException, TableAlreadyExistsException, InvalidDataTypeName, InvalidPKException, FileNotFoundException, NoPKException{
+    public static void parseInputCommand(String inputCommand) throws NoDatabaseSelectedException,InvalidQuerySyntaxException,NoSuchTableException,NoSuchColumnException, FileAccessException, MissingTableFileException, InvalidDataType, ArgumentCountMismatchException, BadInputValueException, InvalidTableInformationException, IOException, ColumnCannotBeNullException, TableAlreadyExistsException, InvalidDataTypeName, InvalidPKException, FileNotFoundException, NoPKException, NoDirectMetaDataModificationException{
         switch(inputCommand){
             case EXIT_COMMAND:
                 io.github.sandeepsukumaran.davisbase.main.DavisBase.exitFlag = true;

@@ -20,6 +20,7 @@ import java.util.Scanner;
 
 import io.github.sandeepsukumaran.davisbase.query.queryParser;
 import io.github.sandeepsukumaran.davisbase.exception.NoDatabaseSelectedException;
+import io.github.sandeepsukumaran.davisbase.exception.NoDirectMetaDataModificationException;
 import io.github.sandeepsukumaran.davisbase.exception.NoPKException;
 import io.github.sandeepsukumaran.davisbase.exception.NoSuchColumnException;
 import io.github.sandeepsukumaran.davisbase.exception.NoSuchTableException;
@@ -120,7 +121,7 @@ public class DavisBase {
                 queryParser.parseInputCommand(inputString);
             }catch(NoDatabaseSelectedException e){
                 System.out.println("\nERROR 1046 : No database selected.");
-            }catch(TableAlreadyExistsException|InvalidDataTypeName|InvalidPKException|NoPKException|InvalidQuerySyntaxException|NoSuchTableException|NoSuchColumnException|FileAccessException|MissingTableFileException|InvalidDataType|ArgumentCountMismatchException | BadInputValueException | InvalidTableInformationException | IOException | ColumnCannotBeNullException e){
+            }catch(NoDirectMetaDataModificationException|TableAlreadyExistsException|InvalidDataTypeName|InvalidPKException|NoPKException|InvalidQuerySyntaxException|NoSuchTableException|NoSuchColumnException|FileAccessException|MissingTableFileException|InvalidDataType|ArgumentCountMismatchException | BadInputValueException | InvalidTableInformationException | IOException | ColumnCannotBeNullException e){
                 System.out.println(e);
                 e.printStackTrace();
             }

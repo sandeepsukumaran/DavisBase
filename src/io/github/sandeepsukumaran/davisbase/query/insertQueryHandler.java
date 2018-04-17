@@ -22,6 +22,7 @@ import io.github.sandeepsukumaran.davisbase.exception.ColumnCannotBeNullExceptio
 import io.github.sandeepsukumaran.davisbase.exception.InvalidQuerySyntaxException;
 import io.github.sandeepsukumaran.davisbase.exception.InvalidTableInformationException;
 import io.github.sandeepsukumaran.davisbase.exception.MissingTableFileException;
+import io.github.sandeepsukumaran.davisbase.exception.NoDirectMetaDataModificationException;
 import io.github.sandeepsukumaran.davisbase.exception.NoSuchColumnException;
 import io.github.sandeepsukumaran.davisbase.exception.NoSuchTableException;
 import io.github.sandeepsukumaran.davisbase.helpermethods.HelperMethods;
@@ -62,8 +63,9 @@ public class insertQueryHandler {
      * @throws io.github.sandeepsukumaran.davisbase.exception.NoSuchColumnException
      * @throws io.github.sandeepsukumaran.davisbase.exception.ColumnCannotBeNullException
      * @throws io.github.sandeepsukumaran.davisbase.exception.MissingTableFileException
+     * @throws io.github.sandeepsukumaran.davisbase.exception.NoDirectMetaDataModificationException
      */
-    public void execute() throws InvalidQuerySyntaxException, NoSuchTableException, ArgumentCountMismatchException, BadInputValueException, InvalidTableInformationException, IOException, NoSuchColumnException, ColumnCannotBeNullException, MissingTableFileException{
+    public void execute() throws InvalidQuerySyntaxException, NoSuchTableException, ArgumentCountMismatchException, BadInputValueException, InvalidTableInformationException, IOException, NoSuchColumnException, ColumnCannotBeNullException, MissingTableFileException, NoDirectMetaDataModificationException{
         if (insertAllMatcher.matches()){
             //select all query
             insertAllQueryExecute();
@@ -75,12 +77,14 @@ public class insertQueryHandler {
             throw new InvalidQuerySyntaxException();
     }
     
-    private void insertAllQueryExecute() throws NoSuchTableException, ArgumentCountMismatchException, BadInputValueException, InvalidTableInformationException, IOException, MissingTableFileException, NoSuchColumnException, ColumnCannotBeNullException{
+    private void insertAllQueryExecute() throws NoSuchTableException, ArgumentCountMismatchException, BadInputValueException, InvalidTableInformationException, IOException, MissingTableFileException, NoSuchColumnException, ColumnCannotBeNullException, NoDirectMetaDataModificationException{
         ArrayList<String> tableNames = DavisBase.getTableNames();
         String tableName = insertAllMatcher.group("tablename");
         if (!tableNames.contains(tableName))
             throw new NoSuchTableException(tableName);
-        else;
+        else if(tableName.equals("davisbase_tables") || tableName.equals("davisbase_columns"))
+            throw new NoDirectMetaDataModificationException();
+        else{}
         TableColumnInfo tabcolinfo = DavisBase.getTableInfo(tableName);
         String values = insertAllMatcher.group("values");
         ParseResult parseres = parseValues(tabcolinfo,tabcolinfo.colNames,values);
@@ -105,7 +109,7 @@ public class insertQueryHandler {
     
     private ArrayList<Object> parseValues(TableColumnInfo tci, String values) throws ArgumentCountMismatchException, BadInputValueException{
         ArrayList<Object> colData = new ArrayList<>();
-        values = values.substring(1,values.length());//ignore first and last ( and )
+        values = values.substring(1,values.length()-1);//ignore first and last ( and )
         //split on commas outside double quotation marks
         String[] tokens = values.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1);
         if(tokens.length != tci.numCols)
@@ -149,16 +153,18 @@ public class insertQueryHandler {
         return colData;
     }
     
-    private void insertQueryExecute() throws NoSuchTableException, ArgumentCountMismatchException, BadInputValueException, InvalidTableInformationException, IOException, NoSuchColumnException, ColumnCannotBeNullException, MissingTableFileException{
+    private void insertQueryExecute() throws NoSuchTableException, ArgumentCountMismatchException, BadInputValueException, InvalidTableInformationException, IOException, NoSuchColumnException, ColumnCannotBeNullException, MissingTableFileException, NoDirectMetaDataModificationException{
         ArrayList<String> tableNames = DavisBase.getTableNames();
         String tableName = insertMatcher.group("tablename");
         if (!tableNames.contains(tableName))
             throw new NoSuchTableException(tableName);
-        else;
+        else if(tableName.equals("davisbase_tables") || tableName.equals("davisbase_columns"))
+            throw new NoDirectMetaDataModificationException();
+        else{}
         TableColumnInfo tabcolinfo = DavisBase.getTableInfo(tableName);
         String cols = insertAllMatcher.group("colnames");
         String values = insertAllMatcher.group("values");
-        cols = cols.substring(1, cols.length());//ignore first and last ( and )
+        cols = cols.substring(1, cols.length()-1);//ignore first and last ( and )
         ArrayList<String>colnames = new ArrayList<>(Arrays.asList(cols.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1)));
         colnames = HelperMethods.uniqueStringArrayList(colnames);
         
@@ -173,7 +179,7 @@ public class insertQueryHandler {
     private ParseResult parseValues(TableColumnInfo tci,ArrayList<String>colNames, String values) throws ArgumentCountMismatchException, BadInputValueException, NoSuchColumnException, ColumnCannotBeNullException{
         ArrayList<Object> colData = new ArrayList<>();
         ArrayList<Boolean> isnull = new ArrayList<>();
-        values = values.substring(1,values.length());//ignore first and last ( and )
+        values = values.substring(1,values.length()-1);//ignore first and last ( and )
         //split on commas outside double quotation marks
         String[] tokens = values.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1);
         if(tokens.length != colNames.size())
