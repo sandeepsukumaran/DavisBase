@@ -16,6 +16,7 @@
  */
 package io.github.sandeepsukumaran.davisbase.datatype;
 
+import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -107,6 +108,49 @@ public class DataType {
         }
         return "";
     }
+    public static boolean validData(String data, String dtypeName){
+        try{
+            switch(dtypeName){
+            case "tinyint": Byte.parseByte(data);return true;
+            case "smallint": Short.parseShort(data);return true;
+            case "int": Short.parseShort(data);return true;
+            case "bigint": Long.parseLong(data);return true;
+            case "real": Float.parseFloat(data);return true;
+            case "double": Double.parseDouble(data);return true;
+            case "datetime":
+                Date dt = SIMPLEDATETIMEFORMAT.parse(data,new ParsePosition(0));
+                return (dt!=null);
+            case "date":
+                Date d = SIMPLEDATEFORMAT.parse(data,new ParsePosition(0));
+                return (d!=null);
+            default: return true;// TEXT trivially true
+            }
+        }catch(NumberFormatException nfe){
+            return false;
+        }
+    }
+    public static boolean validData(String data, DataType dtype){
+        try{
+            switch(dtype.type){
+            case 1: Byte.parseByte(data);return true;
+            case 2: Short.parseShort(data);return true;
+            case 3: Short.parseShort(data);return true;
+            case 4: Long.parseLong(data);return true;
+            case 5: Float.parseFloat(data);return true;
+            case 6: Double.parseDouble(data);return true;
+            case 7:
+                Date dt = SIMPLEDATETIMEFORMAT.parse(data,new ParsePosition(0));
+                return (dt!=null);
+            case 8:
+                Date d = SIMPLEDATEFORMAT.parse(data,new ParsePosition(0));
+                return (d!=null);
+            default: return true;// TEXT trivially true
+            }
+        }catch(NumberFormatException nfe){
+            return false;
+        }
+    }
+    
     int type;
     int size;
     
@@ -134,4 +178,6 @@ public class DataType {
         DATATYPEINDEX.put("date",8);
         DATATYPEINDEX.put("text",9);
     }
+    public static final SimpleDateFormat SIMPLEDATETIMEFORMAT = new SimpleDateFormat("YYYY-MM-DD_hh:mm:ss");
+    public static final SimpleDateFormat SIMPLEDATEFORMAT = new SimpleDateFormat("YYYY-MM-DD");
 }
