@@ -92,6 +92,8 @@ public class queryParser {
             new createQueryHandler(inputCommand).execute();
         else if (inputCommand.matches(DROP_QUERY))
             new dropQueryHandler(inputCommand).execute();
+        else if (inputCommand.matches(DELETE_QUERY))
+            new deleteQueryHandler(inputCommand).execute();
         else
             throw new InvalidQuerySyntaxException();
     }
@@ -157,4 +159,5 @@ public class queryParser {
     static final String UPDATE_QUERY = "update \\w+ set \\w+\\p{javaWhitespace}*=\\p{javaWhitespace}*(\\d+(\\.\\d+)?)|(\"([\\p{Graph}&&[^\"\']])+\") \\p{javaWhitespace}*(where \\w+(\\p{javaWhitespace}*=\\p{javaWhitespace}*((\\d+(\\.\\d+)?)|(\"([\\p{Graph}&&[^\"\']])+\")))|(\\p{javaWhitespace}+is null)|((\\p{javaWhitespace}+is not null)))?";
     static final String CREATE_QUERY = "create\\p{javaWhitespace}+table\\p{javaWhitespace}+(\\p{Alpha}\\w*)\\p{javaWhitespace}*\\(((\\p{javaWhitespace}*\\p{Alpha}\\w*\\p{javaWhitespace}+\\p{Alpha}+\\p{javaWhitespace}*(\\p{javaWhitespace}+((primary\\p{javaWhitespace}+key)|(not\\p{javaWhitespace}+null)))?\\p{javaWhitespace}*,)*(\\p{javaWhitespace}*\\p{Alpha}\\w*\\p{javaWhitespace}+\\p{Alpha}+\\p{javaWhitespace}*(\\p{javaWhitespace}+((primary\\p{javaWhitespace}+key)|(not\\p{javaWhitespace}+null)))?\\p{javaWhitespace}*))\\)";
     static final String DROP_QUERY = "drop\\p{javaWhitespace}+table\\p{javaWhitespace}+(\\p{Alpha}\\w*)";
+    static final String DELETE_QUERY = "delete\\p{javaWhitespace}+from\\p{javaWhitespace}+table\\p{javaWhitespace}+(\\p{Alpha}\\w*)\\p{javaWhitespace}+where\\p{javaWhitespace}+row_id\\p{javaWhitespace}*=\\p{javaWhitespace}*(\\d+)";
 }
