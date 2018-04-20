@@ -96,8 +96,8 @@ public class DataType {
     public static String dataAsString(int type, long val){
         switch(type){
             case 4: return Long.toString(val);
-            case 7: return (new SimpleDateFormat("YYYY-MM-DD_hh:mm:ss").format(new Date(val)));
-            case 8: return (new SimpleDateFormat("YYYY-MM-DD").format(new Date(val)));
+            case 7: return (new SimpleDateFormat("yyyy-MM-dd_hh:mm:ss").format(new Date(val)));
+            case 8: return (new SimpleDateFormat("yyyy-MM-dd").format(new Date(val)));
         }
         return "";
     }
@@ -206,6 +206,6 @@ public class DataType {
         DATATYPEINDEX.put("date",8);
         DATATYPEINDEX.put("text",9);
     }
-    public static final SimpleDateFormat SIMPLEDATETIMEFORMAT = new SimpleDateFormat("YYYY-MM-DD_hh:mm:ss");
-    public static final SimpleDateFormat SIMPLEDATEFORMAT = new SimpleDateFormat("YYYY-MM-DD");
+    public static final SimpleDateFormat SIMPLEDATETIMEFORMAT = new SimpleDateFormat("yyyy-MM-dd_hh:mm:ss");
+    public static final SimpleDateFormat SIMPLEDATEFORMAT = new SimpleDateFormat("yyyy-MM-dd");
 }

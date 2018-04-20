@@ -115,8 +115,8 @@ public class insertQueryHandler {
         if(tokens.length != tci.numCols)
             throw new ArgumentCountMismatchException();
         else;
-        SimpleDateFormat simpleDateTimeFormat = new SimpleDateFormat("YYYY-MM-DD_hh:mm:ss");
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYY-MM-DD");
+        SimpleDateFormat simpleDateTimeFormat = new SimpleDateFormat("yyyy-MM-dd_hh:mm:ss");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         try{
             for(int col=0;col<tci.numCols;++col){
                 switch(tci.colDataTypes.get(col).getDataTypeAsInt()){
@@ -192,8 +192,8 @@ public class insertQueryHandler {
             throw new NoSuchColumnException(colNames.get(0));
         }else;
         
-        SimpleDateFormat simpleDateTimeFormat = new SimpleDateFormat("YYYY-MM-DD_hh:mm:ss");
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYY-MM-DD");
+        SimpleDateFormat simpleDateTimeFormat = new SimpleDateFormat("yyyy-MM-dd_hh:mm:ss");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         try{
             for(int col=0;col<tci.numCols;++col){
                 int inputindex = colNames.indexOf(tci.colNames.get(col));

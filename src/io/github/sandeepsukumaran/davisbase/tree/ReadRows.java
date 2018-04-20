@@ -97,12 +97,12 @@ public class ReadRows {
                         int serialTypeCode = tableFile.readByte();
                         if (serialTypeCode<4)
                             isnull.add(true);
-                        else if (serialTypeCode==12)
+                        else if (serialTypeCode==0x0c)
                             isnull.add(true);
                         else
                             isnull.add(false);
-                        if (serialTypeCode>12)
-                            textFieldLength.put(col, serialTypeCode - 12);
+                        if (serialTypeCode>0x0c)
+                            textFieldLength.put(col, serialTypeCode - 0x0c);
                     }
                     
                     //read record data

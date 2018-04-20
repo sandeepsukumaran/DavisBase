@@ -21,6 +21,7 @@ import static io.github.sandeepsukumaran.davisbase.datatype.DataType.SIMPLEDATEF
 import static io.github.sandeepsukumaran.davisbase.datatype.DataType.SIMPLEDATETIMEFORMAT;
 import io.github.sandeepsukumaran.davisbase.exception.BadInputValueException;
 import io.github.sandeepsukumaran.davisbase.exception.BadWhereClauseValueException;
+import io.github.sandeepsukumaran.davisbase.exception.ColumnCannotBeNullException;
 import io.github.sandeepsukumaran.davisbase.exception.InvalidTableInformationException;
 import io.github.sandeepsukumaran.davisbase.exception.MissingTableFileException;
 import io.github.sandeepsukumaran.davisbase.exception.NoDirectMetaDataModificationException;
@@ -63,8 +64,9 @@ public class updateQueryHandler {
      * @throws io.github.sandeepsukumaran.davisbase.exception.BadWhereClauseValueException
      * @throws io.github.sandeepsukumaran.davisbase.exception.BadInputValueException
      * @throws io.github.sandeepsukumaran.davisbase.exception.NoDirectMetaDataModificationException
+     * @throws io.github.sandeepsukumaran.davisbase.exception.ColumnCannotBeNullException
      */
-    public void execute() throws NoSuchTableException, MissingTableFileException, IOException, FileNotFoundException, InvalidTableInformationException, NoSuchColumnException, BadWhereClauseValueException, BadInputValueException, NoDirectMetaDataModificationException{
+    public void execute() throws NoSuchTableException, MissingTableFileException, IOException, FileNotFoundException, InvalidTableInformationException, NoSuchColumnException, BadWhereClauseValueException, BadInputValueException, NoDirectMetaDataModificationException, ColumnCannotBeNullException{
         /*
         Idea: Use new ArrayList<Byte> to create the new record and overwrite if
         condition satisfied.
@@ -92,7 +94,7 @@ public class updateQueryHandler {
     
     private void performUpdate(String tableName, TableColumnInfo tci, int tarColIndex, Object tarVal, DataType tarColDType, int wherecolindex, String whereVal, String whereclause) throws NoDirectMetaDataModificationException, MissingTableFileException, FileNotFoundException, IOException, InvalidTableInformationException{
         //wherecolindex = -1 => no where clause
-        boolean whereexists = (wherecolindex==-1);
+        boolean whereexists = (wherecolindex!=-1);
         DataType whereDType = null;
         String op = null;
         if(whereexists){
@@ -150,16 +152,25 @@ public class updateQueryHandler {
                     boolean pass = true;
                     
                     short payloadSize = tableFile.readShort();//read payload size
-                    tableFile.skipBytes(4);//skip over row_id
+                    int rowid = tableFile.readInt();//read row_id
                     tableFile.skipBytes(1);//skip over number of columns
                     ArrayList<Byte> serialCodes = new ArrayList<>(); 
                     for(int col=1;col<tci.numCols;++col)
                         serialCodes.add(tableFile.readByte());
                     long pos = tableFile.getFilePointer();// start of binary data
                     if(whereexists){
-                        int numbytesSkipOver = HelperMethods.byteSumUpto(serialCodes,(byte)(wherecolindex-1)); //-1 accounts for row_id not being in list
-                        tableFile.skipBytes(numbytesSkipOver);
-                        pass = readAndEvaluate(tableFile, serialCodes.get(wherecolindex-1), whereDType, whereVal, op);
+                        if(wherecolindex!=0){//not based on primary key
+                            int numbytesSkipOver = HelperMethods.byteSumUpto(serialCodes,(byte)(wherecolindex-1)); //-1 accounts for row_id not being in list
+                            tableFile.skipBytes(numbytesSkipOver);
+                            pass = readAndEvaluate(tableFile, serialCodes.get(wherecolindex-1), whereDType, whereVal, op);
+                        }else{//based on primary key
+                            switch(op){
+                                case "is null":pass = false;break;
+                                case "is not null": pass = true;break;
+                                default:
+                                    pass = ReadRows.evaluate("int", (Integer)rowid, Integer.parseInt(whereVal), op);
+                            }
+                        }
                     }else{}//pass by default since no where clause
                     
                     if(!pass)
@@ -189,7 +200,7 @@ public class updateQueryHandler {
                         tableFile.writeShort((short)(payloadSize - (serialCodes.get(tarColIndex-1)-0x0c)+(((String)tarVal).length())));
                     
                     tableFile.skipBytes(5);//row_id and number of columns
-                    tableFile.skipBytes(Math.max(0,tarColIndex-2));//-1 to account for absence of row_id
+                    tableFile.skipBytes(tarColIndex-1);//-1 to account for absence of row_id
                     
                     //update serial code
                     writeUpdatedSerialCode(tableFile, tarColDType, tarVal);
@@ -302,19 +313,23 @@ public class updateQueryHandler {
             }
         }
     }
-    private int validateTableandColNames(String tableName, String colName, String tarVal) throws NoSuchTableException, MissingTableFileException, IOException, FileNotFoundException, InvalidTableInformationException, NoSuchColumnException, BadInputValueException{
+    private int validateTableandColNames(String tableName, String colName, String tarVal) throws NoSuchTableException, MissingTableFileException, IOException, FileNotFoundException, InvalidTableInformationException, NoSuchColumnException, BadInputValueException, ColumnCannotBeNullException{
         int index;
         ArrayList<String> tableNames = DavisBase.getTableNames();
         if (!tableNames.contains(tableName))
             throw new NoSuchTableException(tableName);
         else;
         ArrayList<String> tablecols = DavisBase.getTableColumns(tableName);
+        TableColumnInfo tci = DavisBase.getTableInfo(tableName);
         if (!tablecols.contains(colName))
             throw new NoSuchColumnException(colName,tableName);
         else
             index = tablecols.indexOf(colName);
         if(tarVal.equals("null"))
-            return index;
+            if(tci.colNullable.get(index))
+                return index;
+            else
+                throw new ColumnCannotBeNullException(colName);
         else{}
         if(!DataType.validData(tarVal,DavisBase.getTableInfo(tableName).colDataTypes.get(index)))
                 throw new BadInputValueException();
@@ -339,5 +354,5 @@ public class updateQueryHandler {
     private final String query;
     private final Pattern updatePattern;
     private final Matcher updateMatcher;
-    private final String UPDATE_QUERY = "update (?<tablename>\\w+) set (?<tarcol>\\w+)\\p{javaWhitespace}*=\\p{javaWhitespace}*(?<tarval>(\\d+(\\.\\d+)?)|(\"([\\p{Graph}&&[^\"\']])+\")|(null)|(\\d{4}-\\d{2}-\\d{2}_\\d{2}:\\d{2}:\\d{2})|(\\d{4}-\\d{2}-\\d{2}))\\p{javaWhitespace}*(?<whereclause> where (?<wherecol>\\w+)((\\p{javaWhitespace}*(=|<=|<|>|>=|<>)\\p{javaWhitespace}*(?<whereval>(\\d+(\\.\\d+)?)|(\"([\\p{Graph}&&[^\"\']])+\")|(\\d{4}-\\d{2}-\\d{2}_\\d{2}:\\d{2}:\\d{2})|(\\d{4}-\\d{2}-\\d{2})))|(\\p{javaWhitespace}+is null)|((\\p{javaWhitespace}+is not null))))?";
+    private final String UPDATE_QUERY = "update (?<tablename>\\w+) set (?<tarcol>\\w+)\\p{javaWhitespace}*=\\p{javaWhitespace}*(?<tarval>(\\d+(\\.\\d+)?)|(\"([\\p{Graph}&&[^\"\']])+\")|(null)|(\\d{4}-([1-9]|1[0-2])-([1-9]|[1-2][0-9]|3[0-1])_([1-9]|1[0-9]|2[0-3]):([0-9]|[1-5][0-9]):([0-9]|[1-5][0-9]))|(\\d{4}-([1-9]|1[0-2])-([1-9]|[1-2][0-9]|3[0-1])))\\p{javaWhitespace}*(?<whereclause> where (?<wherecol>\\w+)((\\p{javaWhitespace}*(=|<=|<|>|>=|<>)\\p{javaWhitespace}*(?<whereval>(\\d+(\\.\\d+)?)|(\"([\\p{Graph}&&[^\"\']])+\")|(\\d{4}-\\d{2}-\\d{2}_\\d{2}:\\d{2}:\\d{2})|(\\d{4}-\\d{2}-\\d{2})))|(\\p{javaWhitespace}+is null)|((\\p{javaWhitespace}+is not null))))?";
 }
