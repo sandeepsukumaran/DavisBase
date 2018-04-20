@@ -48,19 +48,19 @@ public class DataType {
     }
     public static int getDataTypeSize(byte b){
         switch(b){
-            case 0:
-            case 4:
+            case 0x00:
+            case 0x04:
                 return 1;
-            case 1:
-            case 5:
+            case 0x01:
+            case 0x05:
                 return 2;
-            case 2:
-            case 6:
-            case 8:
+            case 0x02:
+            case 0x06:
+            case 0x08:
                 return 4;
-            case 3:
-            case 7:
-            case 9:
+            case 0x03:
+            case 0x07:
+            case 0x09:
             case 0x0a:
             case 0x0b:
                 return 8;
@@ -113,7 +113,7 @@ public class DataType {
             switch(dtypeName){
             case "tinyint": Byte.parseByte(data);return true;
             case "smallint": Short.parseShort(data);return true;
-            case "int": Short.parseShort(data);return true;
+            case "int": Integer.parseInt(data);return true;
             case "bigint": Long.parseLong(data);return true;
             case "real": Float.parseFloat(data);return true;
             case "double": Double.parseDouble(data);return true;
@@ -133,7 +133,7 @@ public class DataType {
         switch(dtype.type){
             case 1: return Byte.parseByte(data);
             case 2: return Short.parseShort(data);
-            case 3: return Short.parseShort(data);
+            case 3: return Integer.parseInt(data);
             case 4: return Long.parseLong(data);
             case 5: return Float.parseFloat(data);
             case 6: return Double.parseDouble(data);
@@ -159,7 +159,7 @@ public class DataType {
             switch(dtype.type){
             case 1: Byte.parseByte(data);return true;
             case 2: Short.parseShort(data);return true;
-            case 3: Short.parseShort(data);return true;
+            case 3: Integer.parseInt(data);return true;
             case 4: Long.parseLong(data);return true;
             case 5: Float.parseFloat(data);return true;
             case 6: Double.parseDouble(data);return true;

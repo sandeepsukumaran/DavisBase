@@ -52,7 +52,7 @@ public class HelperMethods {
     }
     public static int byteSumUpto(ArrayList<Byte> arr, byte index){
         byte sum = 0;
-        for(byte i=0;i<=index;++i){
+        for(byte i=0;i<index;++i){
             byte code = arr.get(i);
             switch(code){
                 case 0x00:

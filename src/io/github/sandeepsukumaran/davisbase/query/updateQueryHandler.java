@@ -17,6 +17,8 @@
 package io.github.sandeepsukumaran.davisbase.query;
 
 import io.github.sandeepsukumaran.davisbase.datatype.DataType;
+import static io.github.sandeepsukumaran.davisbase.datatype.DataType.SIMPLEDATEFORMAT;
+import static io.github.sandeepsukumaran.davisbase.datatype.DataType.SIMPLEDATETIMEFORMAT;
 import io.github.sandeepsukumaran.davisbase.exception.BadInputValueException;
 import io.github.sandeepsukumaran.davisbase.exception.BadWhereClauseValueException;
 import io.github.sandeepsukumaran.davisbase.exception.InvalidTableInformationException;
@@ -32,7 +34,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.text.ParsePosition;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -79,7 +83,7 @@ public class updateQueryHandler {
         boolean whereExists = (whereClause!=null);
         String wherecol; String whereval=null; int wherecolindex = -1;
         if(whereExists){
-            wherecol = updateMatcher.group("whereclause");
+            wherecol = updateMatcher.group("wherecol");
             whereval = updateMatcher.group("whereval");
             wherecolindex = validateWhereClause(tableName, tci,wherecol,whereval);
         }else{}
@@ -114,7 +118,6 @@ public class updateQueryHandler {
             else{}
         }else{}
         String workingDirectory = System.getProperty("user.dir"); // gets current working directory
-            String subfolder;
             if(tableName.equals("davisbase_tables")||tableName.equals("davisbase_columns"))
                 throw new NoDirectMetaDataModificationException();
             else{}
@@ -146,8 +149,7 @@ public class updateQueryHandler {
                     
                     boolean pass = true;
                     
-                    short payloadSize = tableFile.readShort();//skip over payload size
-                    //int row_id = tableFile.readInt();
+                    short payloadSize = tableFile.readShort();//read payload size
                     tableFile.skipBytes(4);//skip over row_id
                     tableFile.skipBytes(1);//skip over number of columns
                     ArrayList<Byte> serialCodes = new ArrayList<>(); 
@@ -181,7 +183,7 @@ public class updateQueryHandler {
                     //update payload size in record header
                     tableFile.seek(pageStart+cellLocation);
                     if(!tarColDType.toString().equals("text"))
-                        tableFile.writeShort(payloadSize);
+                        tableFile.skipBytes(2);//writeShort(payloadSize);
                     else
                         //replacement of null strings is not permitted
                         tableFile.writeShort((short)(payloadSize - (serialCodes.get(tarColIndex-1)-0x0c)+(((String)tarVal).length())));
@@ -194,6 +196,7 @@ public class updateQueryHandler {
                 }
                 curPage = nextPage;
             }
+            tableFile.close();
     }
     
     private boolean readAndEvaluate(RandomAccessFile fp, Byte serialCode, DataType dtype, String whereVal, String op) throws IOException, NumberFormatException{
@@ -212,17 +215,21 @@ public class updateQueryHandler {
             case 3:
                 return ReadRows.evaluate(dtype.toString(),fp.readInt(),Integer.parseInt(whereVal),op);
             case 4:
-            case 7:
-            case 8:
                 return ReadRows.evaluate(dtype.toString(),fp.readLong(),Long.parseLong(whereVal),op);
             case 5:
                 return ReadRows.evaluate(dtype.toString(),fp.readFloat(),Float.parseFloat(whereVal),op);
             case 6:
                 return ReadRows.evaluate(dtype.toString(),fp.readDouble(),Double.parseDouble(whereVal),op);
+            case 7:
+                Date dt = SIMPLEDATETIMEFORMAT.parse(whereVal,new ParsePosition(0));
+                return ReadRows.evaluate(dtype.toString(),fp.readLong(),(Long)dt.getTime(),op);
+            case 8:
+                Date d = SIMPLEDATEFORMAT.parse(whereVal,new ParsePosition(0));
+                return ReadRows.evaluate(dtype.toString(),fp.readLong(),(Long)d.getTime(),op);
             case 9:
                 byte[] readstring = new byte[serialCode-0x0c];
                 fp.read(readstring);
-                return ReadRows.evaluate(dtype.toString(),new String(readstring),whereVal,op);
+                return ReadRows.evaluate(dtype.toString(),new String(readstring),whereVal.substring(1,whereVal.length()-1),op);
         }
         return false;
     }
