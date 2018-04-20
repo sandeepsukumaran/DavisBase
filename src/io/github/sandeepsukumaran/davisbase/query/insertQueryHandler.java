@@ -204,69 +204,96 @@ public class insertQueryHandler {
                         continue;
                     }else//column cannot be null
                         throw new ColumnCannotBeNullException(tci.colNames.get(col));
-                else//value has been given for inserting
+                else{}//value has been given for inserting - but might be null!
                     //isnull.add(false);
                 switch(tci.colDataTypes.get(col).getDataTypeAsInt()){
                     case 1:
-                        if(tokens[inputindex].equals("null")){
-                            isnull.add(true);colData.add(0x00);
-                        }else{
+                        if(tokens[inputindex].equals("null"))
+                            if(tci.colNullable.get(col)){
+                                isnull.add(true);colData.add(0x00);
+                            }else
+                                throw new ColumnCannotBeNullException(tci.colNames.get(col));
+                        else{
                             isnull.add(false);
                             colData.add(Byte.parseByte(tokens[inputindex]));
                         }break;
                     case 2:
-                        if(tokens[inputindex].equals("null")){
-                            isnull.add(true);colData.add(0x00);
-                        }else{
+                        if(tokens[inputindex].equals("null"))
+                            if(tci.colNullable.get(col)){
+                                isnull.add(true);colData.add(0x00);
+                            }else
+                                throw new ColumnCannotBeNullException(tci.colNames.get(col));
+                        else{
                             isnull.add(false);
                             colData.add(Short.parseShort(tokens[inputindex]));
                         }break;
                     case 3:
-                        if(tokens[inputindex].equals("null")){
-                            isnull.add(true);colData.add(0x00);
-                        }else{
+                        if(tokens[inputindex].equals("null"))
+                            if(tci.colNullable.get(col)){
+                                isnull.add(true);colData.add(0x00);
+                            }else
+                                throw new ColumnCannotBeNullException(tci.colNames.get(col));
+                        else{
                             isnull.add(false);
                             colData.add(Integer.parseInt(tokens[inputindex]));
                         }break;
                     case 4:
-                        if(tokens[inputindex].equals("null")){
-                            isnull.add(true);colData.add(0x00);
-                        }else{
+                        if(tokens[inputindex].equals("null"))
+                            if(tci.colNullable.get(col)){
+                                isnull.add(true);colData.add(0x00);
+                            }else
+                                throw new ColumnCannotBeNullException(tci.colNames.get(col));
+                        else{
                             isnull.add(false);
                             colData.add(Long.parseLong(tokens[inputindex]));
                         }break;
                     case 5:
-                        if(tokens[inputindex].equals("null")){
-                            isnull.add(true);colData.add(0x00);
-                        }else{
+                        if(tokens[inputindex].equals("null"))
+                            if(tci.colNullable.get(col)){
+                                isnull.add(true);colData.add(0x00);
+                            }else
+                                throw new ColumnCannotBeNullException(tci.colNames.get(col));
+                        else{
                             isnull.add(false);
                             colData.add(Float.parseFloat(tokens[inputindex]));
                         }break;
                     case 6:
-                        if(tokens[inputindex].equals("null")){
-                            isnull.add(true);colData.add(0x00);
-                        }else{
+                        if(tokens[inputindex].equals("null"))
+                            if(tci.colNullable.get(col)){
+                                isnull.add(true);colData.add(0x00);
+                            }else
+                                throw new ColumnCannotBeNullException(tci.colNames.get(col));
+                        else{
                             isnull.add(false);
                             colData.add(Double.parseDouble(tokens[inputindex]));
                         }break;
                     case 7:
-                        if(tokens[inputindex].equals("null")){
-                            isnull.add(true);colData.add(0x00);
-                        }else{
+                        if(tokens[inputindex].equals("null"))
+                            if(tci.colNullable.get(col)){
+                                isnull.add(true);colData.add(0x00);
+                            }else
+                                throw new ColumnCannotBeNullException(tci.colNames.get(col));
+                        else{
                             isnull.add(false);
                             colData.add(simpleDateTimeFormat.parse(tokens[inputindex]).getTime());
                         }break;
                     case 8:
-                        if(tokens[inputindex].equals("null")){
-                            isnull.add(true);colData.add(0x00);
-                        }else{
+                        if(tokens[inputindex].equals("null"))
+                            if(tci.colNullable.get(col)){
+                                isnull.add(true);colData.add(0x00);
+                            }else
+                                throw new ColumnCannotBeNullException(tci.colNames.get(col));
+                        else{
                             isnull.add(false);
                             colData.add(simpleDateFormat.parse(tokens[inputindex]).getTime());
                         }break;
                     case 9:
-                        if(tokens[inputindex].equals("null")){
-                            isnull.add(true);colData.add(0x00);
-                        }else{
+                        if(tokens[inputindex].equals("null"))
+                            if(tci.colNullable.get(col)){
+                                isnull.add(true);colData.add(0x00);
+                            }else
+                                throw new ColumnCannotBeNullException(tci.colNames.get(col));
+                        else{
                             isnull.add(false);
                             colData.add(tokens[inputindex].substring(1,tokens[inputindex].length()-1));
                         }break;
