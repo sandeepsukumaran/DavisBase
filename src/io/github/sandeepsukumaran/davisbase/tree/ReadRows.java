@@ -326,6 +326,11 @@ public class ReadRows {
                         continue;
                     else;
                     
+                    //check against primary key required
+                    if(colName.equals("row_id")&&(!evaluate("int",row_id,targetValue,operator)))
+                        continue;
+                    else{}
+                    
                     //read record data
                     ResultSetRow rsr = new ResultSetRow();
                     rsr.contents.add(DataType.dataAsString(3,row_id));

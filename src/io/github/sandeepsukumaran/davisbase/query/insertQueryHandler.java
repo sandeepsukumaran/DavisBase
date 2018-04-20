@@ -194,6 +194,8 @@ public class insertQueryHandler {
         values = values.substring(1,values.length()-1);//ignore first and last ( and )
         //split on commas outside double quotation marks
         String[] tokens = values.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1);
+        for(int i=0;i<tokens.length;++i)
+            tokens[i] = tokens[i].trim();
         if(tokens.length != colNames.size())
             throw new ArgumentCountMismatchException();
         else;
