@@ -38,6 +38,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -119,6 +120,7 @@ public class insertQueryHandler {
         else;
         SimpleDateFormat simpleDateTimeFormat = SIMPLEDATETIMEFORMAT;
         SimpleDateFormat simpleDateFormat = SIMPLEDATEFORMAT;
+        Date d;
         try{
             for(int col=0;col<tci.numCols;++col){
                 switch(tci.colDataTypes.get(col).getDataTypeAsInt()){
@@ -141,10 +143,18 @@ public class insertQueryHandler {
                         colData.add(Double.parseDouble(tokens[col]));
                         break;
                     case 7:
-                        colData.add(simpleDateTimeFormat.parse(tokens[col]).getTime());
+                        d = simpleDateTimeFormat.parse(tokens[col]);
+                        if(d!=null)
+                            colData.add(d.getTime());
+                        else
+                            throw new BadInputValueException();
                         break;
                     case 8:
-                        colData.add(simpleDateFormat.parse(tokens[col]).getTime());
+                        d = simpleDateFormat.parse(tokens[col]);
+                        if(d!=null)
+                            colData.add(d.getTime());
+                        else
+                            throw new BadInputValueException();
                         break;
                     case 9:
                         colData.add(tokens[col]);
@@ -196,6 +206,7 @@ public class insertQueryHandler {
         
         SimpleDateFormat simpleDateTimeFormat = SIMPLEDATETIMEFORMAT;
         SimpleDateFormat simpleDateFormat = SIMPLEDATEFORMAT;
+        Date d;
         try{
             for(int col=0;col<tci.numCols;++col){
                 int inputindex = colNames.indexOf(tci.colNames.get(col));
@@ -277,7 +288,11 @@ public class insertQueryHandler {
                                 throw new ColumnCannotBeNullException(tci.colNames.get(col));
                         else{
                             isnull.add(false);
-                            colData.add(simpleDateTimeFormat.parse(tokens[inputindex]).getTime());
+                            d = simpleDateTimeFormat.parse(tokens[inputindex]);
+                            if(d!=null)
+                                colData.add(d.getTime());
+                            else
+                                throw new BadInputValueException();
                         }break;
                     case 8:
                         if(tokens[inputindex].equals("null"))
@@ -287,7 +302,11 @@ public class insertQueryHandler {
                                 throw new ColumnCannotBeNullException(tci.colNames.get(col));
                         else{
                             isnull.add(false);
-                            colData.add(simpleDateFormat.parse(tokens[inputindex]).getTime());
+                            d = simpleDateFormat.parse(tokens[inputindex]);
+                            if(d!=null)
+                                colData.add(d.getTime());
+                            else
+                                throw new BadInputValueException();
                         }break;
                     case 9:
                         if(tokens[inputindex].equals("null"))

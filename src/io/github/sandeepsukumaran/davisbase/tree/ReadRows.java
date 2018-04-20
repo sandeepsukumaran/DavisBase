@@ -17,6 +17,8 @@
 package io.github.sandeepsukumaran.davisbase.tree;
 
 import io.github.sandeepsukumaran.davisbase.datatype.DataType;
+import static io.github.sandeepsukumaran.davisbase.datatype.DataType.SIMPLEDATEFORMAT;
+import static io.github.sandeepsukumaran.davisbase.datatype.DataType.SIMPLEDATETIMEFORMAT;
 import io.github.sandeepsukumaran.davisbase.exception.FileAccessException;
 import io.github.sandeepsukumaran.davisbase.exception.InvalidDataType;
 import io.github.sandeepsukumaran.davisbase.exception.InvalidTableInformationException;
@@ -31,7 +33,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.text.ParsePosition;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -244,7 +248,7 @@ public class ReadRows {
                 throw new InvalidTableInformationException(tableName);
             else;
             
-            Object targetValue=null;
+            Object targetValue=null; Date d;
             switch(schema.colDataTypes.get(colNum).getDataTypeAsInt()){
                 case 1://tinyint
                     targetValue = Byte.parseByte(tarValue);
@@ -256,8 +260,6 @@ public class ReadRows {
                     targetValue = Integer.parseInt(tarValue);
                     break;
                 case 4://bigint
-                case 7://datetime
-                case 8://date
                     targetValue = Long.parseLong(tarValue);
                     break;
                 case 5://real
@@ -265,6 +267,20 @@ public class ReadRows {
                     break;
                 case 6://double
                     targetValue = Double.parseDouble(tarValue);
+                    break;
+                case 7://datetime
+                    d = SIMPLEDATETIMEFORMAT.parse(tarValue,new ParsePosition(0));
+                    if(d!=null)
+                        targetValue = (Long)d.getTime();
+                    else
+                        throw new InvalidDataType(tarValue);
+                    break;
+                case 8://date
+                    d = SIMPLEDATEFORMAT.parse(tarValue,new ParsePosition(0));
+                    if(d!=null)
+                        targetValue = (Long)d.getTime();
+                    else
+                        throw new InvalidDataType(tarValue);
                     break;
                 case 9:
                     targetValue = tarValue.substring(1,tarValue.length()-1);//get rid of quotes  
@@ -436,7 +452,8 @@ public class ReadRows {
             }
         }catch(InvalidTableInformationException | IOException e){throw new FileAccessException();
         }catch(MissingTableFileException e){throw e;
-        }catch(NumberFormatException e){e.printStackTrace();throw new InvalidDataType(tarValue);}
+        }catch(NumberFormatException e){e.printStackTrace();throw new InvalidDataType(tarValue);
+        }catch(InvalidDataType e){e.printStackTrace();throw new InvalidDataType(tarValue);}
         return rs;
     }
     
