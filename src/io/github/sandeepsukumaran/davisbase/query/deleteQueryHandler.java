@@ -109,6 +109,8 @@ public class deleteQueryHandler {
                 for(Short cellLocation:cellLocations)
                     tableFile.writeShort(cellLocation);
                 singleDeleteDone = true;
+                //since only one delete can happen:
+                tableFile.close();
             }else{}
             
             if(singleDeleteDone)

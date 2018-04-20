@@ -204,6 +204,7 @@ public class ReadRows {
                 }
                 curPage = nextPage;
             }
+            tableFile.close();
         }catch(InvalidTableInformationException | IOException e){throw new FileAccessException();
         }catch(MissingTableFileException e){throw e;}
         return rs;
@@ -450,10 +451,11 @@ public class ReadRows {
                 }
                 curPage = nextPage;
             }
+            tableFile.close();
         }catch(InvalidTableInformationException | IOException e){throw new FileAccessException();
         }catch(MissingTableFileException e){throw e;
-        }catch(NumberFormatException e){e.printStackTrace();throw new InvalidDataType(tarValue);
-        }catch(InvalidDataType e){e.printStackTrace();throw new InvalidDataType(tarValue);}
+        }catch(NumberFormatException|InvalidDataType e){/*e.printStackTrace();*/throw new InvalidDataType(tarValue);
+        }
         return rs;
     }
     
@@ -627,6 +629,7 @@ public class ReadRows {
                 }
                 curPage = nextPage;
             }
+            tableFile.close();
         }catch(InvalidTableInformationException | IOException e){throw new FileAccessException();
         }catch(MissingTableFileException e){throw e;}
         return rs;
@@ -697,6 +700,7 @@ public class ReadRows {
             
             curPage = nextPage;
         }
+        catalogTableFile.close();
         return ti;
     }
 
@@ -792,6 +796,7 @@ public class ReadRows {
             
             curPage = nextPage;
         }
+        catalogTableColumnFile.close();
         for(int i=1;i<=ordinalPos.size();++i){
             int pos = ordinalPos.indexOf((short)i);
             tci.colNames.add(colNames.get(pos));

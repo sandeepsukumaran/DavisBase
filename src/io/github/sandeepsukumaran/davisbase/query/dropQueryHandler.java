@@ -126,6 +126,7 @@ public class dropQueryHandler {
             }else{}
             curPage = nextPage;
         }
+        tableFile.close();
         UpdateRecord.decrementRecordCount("davisbase_tables");
     }
     
@@ -182,7 +183,7 @@ public class dropQueryHandler {
             }else{}
             curPage = nextPage;
         }
-        
+        tableFile.close();
         UpdateRecord.decrementRecordCount("davisbase_columns",numCols);
     }
     private final Pattern dropPattern;

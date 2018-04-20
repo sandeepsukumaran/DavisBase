@@ -37,8 +37,6 @@ import java.nio.file.Paths;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 /**
  *
  * @author Sandeep
@@ -91,9 +89,9 @@ public class DavisBase {
                 HelperMethods.writeInitialMetaDataFiles();
                 populateTableNames();
             }catch(InvalidTableInformationException | MissingTableFileException | IOException e){
-                System.out.println("ERROR : Unable to setup file structures. Terminating...");
                 System.out.println(e);
-                e.printStackTrace();
+                System.out.println("ERROR : Unable to setup file structures. Please manually delete data folder (partially set-up) before re-run. Terminating...");
+                //e.printStackTrace();
                 return -1;
             }
         }
@@ -123,8 +121,8 @@ public class DavisBase {
             }catch(NoDatabaseSelectedException e){
                 System.out.println("\nERROR 1046 : No database selected.");
             }catch(BadWhereClauseValueException|NoDirectMetaDataModificationException|TableAlreadyExistsException|InvalidDataTypeName|InvalidPKException|NoPKException|InvalidQuerySyntaxException|NoSuchTableException|NoSuchColumnException|FileAccessException|MissingTableFileException|InvalidDataType|ArgumentCountMismatchException | BadInputValueException | InvalidTableInformationException | IOException | ColumnCannotBeNullException e){
-                System.out.println(e);
-                e.printStackTrace();
+                System.out.println(e.getMessage());
+                //e.printStackTrace();
             }
         }
         
@@ -294,7 +292,7 @@ public class DavisBase {
     /**< Set to true to indicate program must terminate.*/public static boolean exitFlag = false;
     /**< Variable attached to STDIN to read user inputs, delimited by ;*/static Scanner inputStream = new Scanner(System.in).useDelimiter(";");
     /**< Name of currently selected database.*/public static String activeDatabase = "";//null - use this if implementing databases feature
-    public static ArrayList<String> tableNames;
+    /**< Name of tables currently in selected database.*/public static ArrayList<String> tableNames;
     
     /**< Variable holding the text string displayed as prompt. Terminated with >.*/static String promptText = "davisql>";
     /**< String describing version number.*/public static final String VERSIONSTRING = "0.1.0";

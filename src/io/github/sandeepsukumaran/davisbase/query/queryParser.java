@@ -129,22 +129,22 @@ public class queryParser {
         //System.out.println("\tCREATE DATABASE database_name;                   Creates an empty database.");
         //System.out.println("\tSHOW DATABASES;                                  Displays all databases.");
         //System.out.println("\tDROP DATABASE database_name;                     Deletes a database.");
-        System.out.println("\tSHOW TABLES;                                     Displays all tables in current database.");
+        System.out.println("\tSHOW TABLES;                                         Displays all tables in current database.");
         //System.out.println("\tDESC table_name;                                 Displays table schema.");
-        System.out.println("\tCREATE TABLE table_name (                        Creates a table in current database.");
+        System.out.println("\tCREATE TABLE table_name (                            Creates a table in current database.");
         System.out.println("\t\t<column_name> <datatype> [PRIMARY KEY | NOT NULL]");
         System.out.println("\t\t...);");
-        System.out.println("\tDROP TABLE table_name;                           Deletes a table data and its schema.");
-        System.out.println("\tSELECT <column_list> FROM table_name             Display records whose rowid is <id>.");
-        System.out.println("\t\t[WHERE rowid = <value>];");
-        System.out.println("\tINSERT INTO table_name                           Inserts a record into the table.");
+        System.out.println("\tDROP TABLE table_name;                               Deletes a table data and its schema.");
+        System.out.println("\tSELECT <column_list> FROM table_name                 Display records whose rowid is <id>.");
+        System.out.println("\t\t[WHERE <condition>];");
+        System.out.println("\tINSERT INTO table_name                               Inserts a record into the table.");
         System.out.println("\t\t[(<column1>, ...)] VALUES (<value1>, <value2>, ...);");
-        //System.out.println("\tDELETE FROM table_name [WHERE condition];        Deletes a record from a table.");
-        System.out.println("\tUPDATE table_name SET <conditions>               Updates a record from a table.");
+        System.out.println("\tDELETE FROM TABLE table_name WHERE row_id = <value>; Deletes a record from a table.");
+        System.out.println("\tUPDATE table_name SET <column> = <value>             Updates a record from a table.");
         System.out.println("\t\t[WHERE condition];");
-        System.out.println("\tVERSION;                                         Display current database engine version.");
-        System.out.println("\tHELP;                                            Displays help information");
-        System.out.println("\tEXIT;                                            Exits the program\n\n");
+        System.out.println("\tVERSION;                                             Display current database engine version.");
+        System.out.println("\tHELP;                                                Displays help information");
+        System.out.println("\tEXIT;                                                Exits the program\n\n");
     }
     
     //Keywords list

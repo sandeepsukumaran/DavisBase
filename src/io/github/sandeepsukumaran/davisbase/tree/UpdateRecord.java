@@ -72,6 +72,7 @@ public class UpdateRecord {
                 int curCount = tableFile.readInt();
                 tableFile.seek(pos);
                 tableFile.writeInt(curCount+1);
+                tableFile.close();
                 return;
             }
             curPage = nextPage;
@@ -117,6 +118,7 @@ public class UpdateRecord {
                 int curCount = tableFile.readInt();
                 tableFile.seek(pos);
                 tableFile.writeInt(curCount+count);
+                tableFile.close();
                 return;
             }
             curPage = nextPage;
@@ -162,6 +164,7 @@ public class UpdateRecord {
                 int curCount = tableFile.readInt();
                 tableFile.seek(pos);
                 tableFile.writeInt(curCount-1);
+                tableFile.close();
                 return;
             }
             curPage = nextPage;
@@ -207,6 +210,7 @@ public class UpdateRecord {
                 int curCount = tableFile.readInt();
                 tableFile.seek(pos);
                 tableFile.writeInt(curCount-count);
+                tableFile.close();
                 return;
             }
             curPage = nextPage;
@@ -250,6 +254,7 @@ public class UpdateRecord {
                 else{}
                 tableFile.skipBytes(4);
                 tableFile.writeShort(3);
+                tableFile.close();
                 return;
             }
             curPage = nextPage;

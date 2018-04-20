@@ -29,7 +29,7 @@ public class Display {
         
     }
     public static void displayResults(ArrayList<String> columns, ResultSet rs){
-        if(rs==null || rs.data==null || rs.data.size()==0){
+        if(rs==null || rs.data==null || rs.data.isEmpty()){
             System.out.println("Empty set.");
             return;
         }else;
