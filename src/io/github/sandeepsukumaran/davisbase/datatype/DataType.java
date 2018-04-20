@@ -30,6 +30,14 @@ public class DataType {
         type = -1;
         size = -1;
     }
+    static{
+       SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+       sdf.setLenient(false);
+       SIMPLEDATETIMEFORMAT = sdf;
+       sdf = new SimpleDateFormat("yyyy-MM-dd");
+       sdf.setLenient(false);
+       SIMPLEDATEFORMAT = sdf;
+    }
     public DataType(String dataType){
         type = DATATYPEINDEX.get(dataType);
         size = DATATYPESIZE.get(type);
@@ -96,8 +104,8 @@ public class DataType {
     public static String dataAsString(int type, long val){
         switch(type){
             case 4: return Long.toString(val);
-            case 7: return (new SimpleDateFormat("yyyy-MM-dd_hh:mm:ss").format(new Date(val)));
-            case 8: return (new SimpleDateFormat("yyyy-MM-dd").format(new Date(val)));
+            case 7: return (SIMPLEDATETIMEFORMAT.format(new Date(val)));
+            case 8: return (SIMPLEDATEFORMAT.format(new Date(val)));
         }
         return "";
     }
@@ -206,6 +214,6 @@ public class DataType {
         DATATYPEINDEX.put("date",8);
         DATATYPEINDEX.put("text",9);
     }
-    public static final SimpleDateFormat SIMPLEDATETIMEFORMAT = new SimpleDateFormat("yyyy-MM-dd_hh:mm:ss");
-    public static final SimpleDateFormat SIMPLEDATEFORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    public static final SimpleDateFormat SIMPLEDATETIMEFORMAT;
+    public static final SimpleDateFormat SIMPLEDATEFORMAT;
 }

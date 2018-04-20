@@ -16,6 +16,8 @@
  */
 package io.github.sandeepsukumaran.davisbase.query;
 
+import static io.github.sandeepsukumaran.davisbase.datatype.DataType.SIMPLEDATEFORMAT;
+import static io.github.sandeepsukumaran.davisbase.datatype.DataType.SIMPLEDATETIMEFORMAT;
 import io.github.sandeepsukumaran.davisbase.exception.ArgumentCountMismatchException;
 import io.github.sandeepsukumaran.davisbase.exception.BadInputValueException;
 import io.github.sandeepsukumaran.davisbase.exception.ColumnCannotBeNullException;
@@ -115,8 +117,8 @@ public class insertQueryHandler {
         if(tokens.length != tci.numCols)
             throw new ArgumentCountMismatchException();
         else;
-        SimpleDateFormat simpleDateTimeFormat = new SimpleDateFormat("yyyy-MM-dd_hh:mm:ss");
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat simpleDateTimeFormat = SIMPLEDATETIMEFORMAT;
+        SimpleDateFormat simpleDateFormat = SIMPLEDATEFORMAT;
         try{
             for(int col=0;col<tci.numCols;++col){
                 switch(tci.colDataTypes.get(col).getDataTypeAsInt()){
@@ -192,8 +194,8 @@ public class insertQueryHandler {
             throw new NoSuchColumnException(colNames.get(0));
         }else;
         
-        SimpleDateFormat simpleDateTimeFormat = new SimpleDateFormat("yyyy-MM-dd_hh:mm:ss");
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat simpleDateTimeFormat = SIMPLEDATETIMEFORMAT;
+        SimpleDateFormat simpleDateFormat = SIMPLEDATEFORMAT;
         try{
             for(int col=0;col<tci.numCols;++col){
                 int inputindex = colNames.indexOf(tci.colNames.get(col));
