@@ -129,6 +129,31 @@ public class DataType {
             return false;
         }
     }
+    public static Object valueToObject(String data, DataType dtype){
+        switch(dtype.type){
+            case 1: return Byte.parseByte(data);
+            case 2: return Short.parseShort(data);
+            case 3: return Short.parseShort(data);
+            case 4: return Long.parseLong(data);
+            case 5: return Float.parseFloat(data);
+            case 6: return Double.parseDouble(data);
+            case 7:
+                Date dt = SIMPLEDATETIMEFORMAT.parse(data,new ParsePosition(0));
+                if(dt!=null)
+                    return (Long)dt.getTime();
+                else
+                    return null;
+            case 8:
+                Date d = SIMPLEDATEFORMAT.parse(data,new ParsePosition(0));
+                if(d!=null)
+                    return (Long)d.getTime();
+                else
+                    return null;
+            case 9:
+                return data.substring(1,data.length()-1); //get rid of quotes
+        }
+        return null;
+    }
     public static boolean validData(String data, DataType dtype){
         try{
             switch(dtype.type){
@@ -149,6 +174,9 @@ public class DataType {
         }catch(NumberFormatException nfe){
             return false;
         }
+    }
+    public static boolean isNullSerialCode(Byte serialcode){
+        return (serialcode <= 0x03)||(serialcode == 0x0c);
     }
     
     int type;

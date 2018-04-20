@@ -50,6 +50,54 @@ public class HelperMethods {
                 result.add(e);
         return result;
     }
+    public static int byteSumUpto(ArrayList<Byte> arr, byte index){
+        byte sum = 0;
+        for(byte i=0;i<=index;++i){
+            byte code = arr.get(i);
+            switch(code){
+                case 0x00:
+                case 0x04:
+                case 0x0c:  sum+=1;break;
+                case 0x01:
+                case 0x05:  sum+=2;break;
+                case 0x02:
+                case 0x06:
+                case 0x08:  sum+=4;break;
+                case 0x03:
+                case 0x07:
+                case 0x09:
+                case 0x0a:
+                case 0x0b:  sum+=8;break;
+                default://>0x0c
+                    sum+= code-0x0c;
+            }
+        }
+        return sum;
+    }
+    public static int byteSumAfter(ArrayList<Byte> arr, byte index){
+        byte sum = 0;
+        for(byte i=(byte)(index+1);i<arr.size();++i){
+            byte code = arr.get(i);
+            switch(code){
+                case 0x00:
+                case 0x04:
+                case 0x0c:  sum+=1;break;
+                case 0x01:
+                case 0x05:  sum+=2;break;
+                case 0x02:
+                case 0x06:
+                case 0x08:  sum+=4;break;
+                case 0x03:
+                case 0x07:
+                case 0x09:
+                case 0x0a:
+                case 0x0b:  sum+=8;break;
+                default://>0x0c
+                    sum+= code-0x0c;
+            }
+        }
+        return sum;
+    }
     
     public static boolean writeRecordToFirstPage(RandomAccessFile tableFile, byte[] record,int row_id) throws IOException, MissingTableFileException, FileNotFoundException, InvalidTableInformationException{
         tableFile.seek(0);

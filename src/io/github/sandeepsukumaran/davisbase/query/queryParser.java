@@ -19,6 +19,7 @@ package io.github.sandeepsukumaran.davisbase.query;
 import io.github.sandeepsukumaran.davisbase.display.Display;
 import io.github.sandeepsukumaran.davisbase.exception.ArgumentCountMismatchException;
 import io.github.sandeepsukumaran.davisbase.exception.BadInputValueException;
+import io.github.sandeepsukumaran.davisbase.exception.BadWhereClauseValueException;
 import io.github.sandeepsukumaran.davisbase.exception.ColumnCannotBeNullException;
 import io.github.sandeepsukumaran.davisbase.exception.FileAccessException;
 import io.github.sandeepsukumaran.davisbase.exception.InvalidDataType;
@@ -65,8 +66,9 @@ public class queryParser {
      * @throws java.io.FileNotFoundException
      * @throws io.github.sandeepsukumaran.davisbase.exception.NoPKException
      * @throws io.github.sandeepsukumaran.davisbase.exception.NoDirectMetaDataModificationException
+     * @throws io.github.sandeepsukumaran.davisbase.exception.BadWhereClauseValueException
      */
-    public static void parseInputCommand(String inputCommand) throws NoDatabaseSelectedException,InvalidQuerySyntaxException,NoSuchTableException,NoSuchColumnException, FileAccessException, MissingTableFileException, InvalidDataType, ArgumentCountMismatchException, BadInputValueException, InvalidTableInformationException, IOException, ColumnCannotBeNullException, TableAlreadyExistsException, InvalidDataTypeName, InvalidPKException, FileNotFoundException, NoPKException, NoDirectMetaDataModificationException{
+    public static void parseInputCommand(String inputCommand) throws NoDatabaseSelectedException,InvalidQuerySyntaxException,NoSuchTableException,NoSuchColumnException, FileAccessException, MissingTableFileException, InvalidDataType, ArgumentCountMismatchException, BadInputValueException, InvalidTableInformationException, IOException, ColumnCannotBeNullException, TableAlreadyExistsException, InvalidDataTypeName, InvalidPKException, FileNotFoundException, NoPKException, NoDirectMetaDataModificationException, BadWhereClauseValueException{
         switch(inputCommand){
             case EXIT_COMMAND:
                 io.github.sandeepsukumaran.davisbase.main.DavisBase.exitFlag = true;
@@ -87,7 +89,7 @@ public class queryParser {
         else if (inputCommand.matches(INSERT_QUERY))
             new insertQueryHandler(inputCommand).execute();
         else if(inputCommand.matches(UPDATE_QUERY))
-            System.out.println("Update query");//new updateQueryHandler(inputCommand).execute();
+            new updateQueryHandler(inputCommand).execute();
         else if(inputCommand.matches(CREATE_QUERY))
             new createQueryHandler(inputCommand).execute();
         else if (inputCommand.matches(DROP_QUERY))

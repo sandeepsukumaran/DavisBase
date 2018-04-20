@@ -785,7 +785,15 @@ public class ReadRows {
         return tci;
     }
 
-    private static boolean evaluate(String dtype, Object curVal,Object tarVal,String op){
+    /**
+     *
+     * @param dtype
+     * @param curVal
+     * @param tarVal
+     * @param op
+     * @return
+     */
+    public static boolean evaluate(String dtype, Object curVal,Object tarVal,String op){
         switch(DataType.getDataTypeAsInt(dtype)){
             case 1://tinyint
                 byte bcurval = (byte)curVal;

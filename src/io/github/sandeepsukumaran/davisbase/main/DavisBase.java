@@ -8,6 +8,7 @@ package io.github.sandeepsukumaran.davisbase.main;
 import io.github.sandeepsukumaran.davisbase.datatype.DataType;
 import io.github.sandeepsukumaran.davisbase.exception.ArgumentCountMismatchException;
 import io.github.sandeepsukumaran.davisbase.exception.BadInputValueException;
+import io.github.sandeepsukumaran.davisbase.exception.BadWhereClauseValueException;
 import io.github.sandeepsukumaran.davisbase.exception.ColumnCannotBeNullException;
 import io.github.sandeepsukumaran.davisbase.exception.FileAccessException;
 import io.github.sandeepsukumaran.davisbase.exception.InvalidDataType;
@@ -102,7 +103,7 @@ public class DavisBase {
     /**
      * @param args the command line arguments (ignored)
      */
-    public static void main(String[] args) {
+    public static void main(String[] args){
         //display startup splash screen
         displaySplash();
         if (setupFS() == -1){
@@ -121,7 +122,7 @@ public class DavisBase {
                 queryParser.parseInputCommand(inputString);
             }catch(NoDatabaseSelectedException e){
                 System.out.println("\nERROR 1046 : No database selected.");
-            }catch(NoDirectMetaDataModificationException|TableAlreadyExistsException|InvalidDataTypeName|InvalidPKException|NoPKException|InvalidQuerySyntaxException|NoSuchTableException|NoSuchColumnException|FileAccessException|MissingTableFileException|InvalidDataType|ArgumentCountMismatchException | BadInputValueException | InvalidTableInformationException | IOException | ColumnCannotBeNullException e){
+            }catch(BadWhereClauseValueException|NoDirectMetaDataModificationException|TableAlreadyExistsException|InvalidDataTypeName|InvalidPKException|NoPKException|InvalidQuerySyntaxException|NoSuchTableException|NoSuchColumnException|FileAccessException|MissingTableFileException|InvalidDataType|ArgumentCountMismatchException | BadInputValueException | InvalidTableInformationException | IOException | ColumnCannotBeNullException e){
                 System.out.println(e);
                 e.printStackTrace();
             }
