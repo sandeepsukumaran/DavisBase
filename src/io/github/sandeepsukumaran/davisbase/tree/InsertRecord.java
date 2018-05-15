@@ -106,9 +106,9 @@ public class InsertRecord {
             tableFile.seek(2*DavisBase.PAGESIZE);
             tableFile.writeByte(5);//0x05
             tableFile.writeByte(1);
-            tableFile.writeShort((short)(3*DavisBase.PAGESIZE - 8 - DavisBase.PAGESIZE));
+            tableFile.writeShort((short)(3*DavisBase.PAGESIZE - 8 - 2*DavisBase.PAGESIZE));
             tableFile.writeInt(2);
-            tableFile.writeShort((short)(3*DavisBase.PAGESIZE - 8 - DavisBase.PAGESIZE));
+            tableFile.writeShort((short)(3*DavisBase.PAGESIZE - 8 - 2*DavisBase.PAGESIZE));
             tableFile.seek(3*DavisBase.PAGESIZE - 8);
             tableFile.writeInt(1);
             tableFile.writeInt(row_id);
@@ -156,9 +156,9 @@ public class InsertRecord {
             tableFile.seek((curPage-1)*DavisBase.PAGESIZE);
             tableFile.writeByte(13);//0x0d
             tableFile.writeByte(1);
-            tableFile.writeShort((short)(curPage*DavisBase.PAGESIZE - record.length - DavisBase.PAGESIZE));
+            tableFile.writeShort((short)(curPage*DavisBase.PAGESIZE - record.length - (curPage-1)*DavisBase.PAGESIZE));
             tableFile.writeInt(-1);
-            tableFile.writeShort((short)(curPage*DavisBase.PAGESIZE - record.length - DavisBase.PAGESIZE));
+            tableFile.writeShort((short)(curPage*DavisBase.PAGESIZE - record.length - (curPage-1)*DavisBase.PAGESIZE));
             tableFile.seek(curPage*DavisBase.PAGESIZE - record.length);
             tableFile.write(record);
             //write parent page

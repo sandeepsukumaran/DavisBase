@@ -354,5 +354,5 @@ public class updateQueryHandler {
     private final String query;
     private final Pattern updatePattern;
     private final Matcher updateMatcher;
-    private final String UPDATE_QUERY = "update (?<tablename>\\w+) set (?<tarcol>\\w+)\\p{javaWhitespace}*=\\p{javaWhitespace}*(?<tarval>(-?\\d+(\\.\\d+)?)|(\"([\\p{Graph}&&[^\"\']])+\")|(null)|(\\d{4}-\\d{2}-\\d{2}_\\d{2}:\\d{2}:\\d{2})|(\\d{4}-\\d{2}-\\d{2}))\\p{javaWhitespace}*(?<whereclause> where (?<wherecol>\\w+)((\\p{javaWhitespace}*(=|<=|<|>|>=|<>)\\p{javaWhitespace}*(?<whereval>(-?\\d+(\\.\\d+)?)|(\"([\\p{Graph}&&[^\"\']])+\")|(\\d{4}-\\d{2}-\\d{2}_\\d{2}:\\d{2}:\\d{2})|(\\d{4}-\\d{2}-\\d{2})))|(\\p{javaWhitespace}+is null)|((\\p{javaWhitespace}+is not null))))?";
+    private final String UPDATE_QUERY = "update (?<tablename>\\w+) set (?<tarcol>\\w+)\\p{javaWhitespace}*=\\p{javaWhitespace}*(?<tarval>(-?\\d+(\\.\\d+)?)|(\"([[\\p{Graph}&&[^\"\']]\\p{javaWhitespace}*])+\")|(null)|(\\d{4}-\\d{2}-\\d{2}_\\d{2}:\\d{2}:\\d{2})|(\\d{4}-\\d{2}-\\d{2}))\\p{javaWhitespace}*(?<whereclause> where (?<wherecol>\\w+)((\\p{javaWhitespace}*(=|<=|<|>|>=|<>)\\p{javaWhitespace}*(?<whereval>(-?\\d+(\\.\\d+)?)|(\"([[\\p{Graph}&&[^\"\']]\\p{javaWhitespace}*])+\")|(\\d{4}-\\d{2}-\\d{2}_\\d{2}:\\d{2}:\\d{2})|(\\d{4}-\\d{2}-\\d{2})))|(\\p{javaWhitespace}+is null)|((\\p{javaWhitespace}+is not null))))?";
 }
